@@ -35,7 +35,11 @@ export function WorkGrid() {
     >
       <div className="grid w-full grid-cols-12">
         {work.items.map((item, index) => (
-          <article key={item.id} className={GRID_POSITIONS[index] ?? "col-span-12"}>
+          <article
+            key={item.id}
+            data-reveal-card
+            className={GRID_POSITIONS[index] ?? "col-span-12"}
+          >
             <a
               href={item.href}
               {...(item.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
