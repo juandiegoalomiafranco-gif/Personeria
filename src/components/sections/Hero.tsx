@@ -21,6 +21,7 @@ export function Hero() {
       id="inicio"
       data-section-bg="deep"
       data-type3d={hero.type3d}
+      data-stickers
       className="relative z-10 grid h-dvh w-full grid-cols-12 grid-rows-[auto_1fr] px-4 py-18 lg:h-screen lg:px-14 lg:py-24"
     >
       <div className="order-2 col-span-12 flex flex-col font-mono text-base lg:order-1 lg:grid lg:grid-cols-12">

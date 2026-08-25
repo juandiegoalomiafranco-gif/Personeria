@@ -9,6 +9,7 @@ import { ScrollProvider } from "@/providers/ScrollProvider";
 import { StageProvider, useStage } from "@/providers/StageProvider";
 import { ScrollChoreography } from "@/components/animation/ScrollChoreography";
 import { BackgroundCanvas } from "@/components/three/BackgroundCanvas";
+import { ForegroundCanvas } from "@/components/three/ForegroundCanvas";
 import { Cursor } from "@/components/ui/Cursor";
 import { Chrome } from "./Chrome";
 import { GridOverlay } from "./GridOverlay";
@@ -30,7 +31,8 @@ import { ScrollArea } from "./ScrollArea";
  *   50   chrome (header y barra inferior)
  *   90   preloader
  *   100  cursor
- *   30   canvas del túnel (por encima del chrome, a propósito)
+ *   30   canvas de primer plano: stickers y túnel (por encima del chrome,
+ *        a propósito — es lo que los hace sentir sueltos en la sala)
  */
 export function Shell({ children }: { children: ReactNode }) {
   return (
@@ -58,6 +60,7 @@ function Stage({ children }: { children: ReactNode }) {
       <GridOverlay />
       <ScrollArea ref={containerRef}>{children}</ScrollArea>
       <Chrome />
+      <ForegroundCanvas />
       <Preloader onDone={markReady} />
       <Cursor />
       <ScrollChoreography />
