@@ -28,7 +28,7 @@ export function Contact() {
     <footer
       id="contacto"
       data-section-bg="deep"
-      data-type3d={contact.type3d}
+      data-type3d="contact"
       data-stickers
       className="pointer-events-none relative z-10 flex h-dvh w-full flex-col justify-center p-6 lg:h-screen lg:p-16"
     >

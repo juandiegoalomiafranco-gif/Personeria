@@ -14,6 +14,7 @@ import { Cursor } from "@/components/ui/Cursor";
 import { Chrome } from "./Chrome";
 import { GridOverlay } from "./GridOverlay";
 import { Preloader } from "./Preloader";
+import { SkipLink } from "./SkipLink";
 import { ScrollArea } from "./ScrollArea";
 
 /**
@@ -56,10 +57,15 @@ function Stage({ children }: { children: ReactNode }) {
 
   return (
     <ScrollProvider containerRef={containerRef}>
+      <SkipLink />
+      {/* El chrome va ANTES del contenedor de scroll en el DOM aunque se pinte
+          encima: el apilado lo resuelve el z-index, y con el orden invertido un
+          usuario de teclado tenía que tabular por las diez propuestas antes de
+          llegar al menú. */}
+      <Chrome />
       <BackgroundCanvas />
       <GridOverlay />
       <ScrollArea ref={containerRef}>{children}</ScrollArea>
-      <Chrome />
       <ForegroundCanvas />
       <Preloader onDone={markReady} />
       <Cursor />

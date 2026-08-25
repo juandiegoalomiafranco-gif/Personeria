@@ -123,6 +123,7 @@ export const es: SiteContent = {
   chrome: {
     timezoneLabel: "GMT-5 CO",
     weather: { latitude: 4.711, longitude: -74.0721 },
+    skipToContent: "Saltar al contenido",
     localeToggleLabel: "Cambiar idioma",
   },
 };

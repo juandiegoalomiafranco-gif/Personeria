@@ -7,7 +7,15 @@ import { useScroll } from "@/providers/ScrollProvider";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { MAX_DPR, useQualityTier } from "@/hooks/useQualityTier";
 import { createProgressStore } from "@/lib/scroll/progress";
+import { useContent } from "@/providers/LocaleProvider";
 import { InflatedType } from "./InflatedType";
+
+/** Secciones que pueden pedir tipografía 3D, en el orden de la página. */
+type TypeSlot = "hero" | "contact";
+
+function isTypeSlot(value: string | undefined): value is TypeSlot {
+  return value === "hero" || value === "contact";
+}
 
 /**
  * Canvas de fondo con la tipografía 3D.
@@ -17,16 +25,22 @@ import { InflatedType } from "./InflatedType";
  * hay parallax, hay un objeto que gira a su propio ritmo mientras el texto pasa
  * por delante.
  *
- * Las secciones que quieren tipografía 3D se declaran con `data-type3d="PALABRA"`
- * y este componente las observa, igual que `data-section-bg`. Así no hay que
- * cablear un provider ni que las secciones sepan que existe un canvas.
+ * Las secciones que quieren tipografía 3D se declaran con `data-type3d="hero"` o
+ * `"contact"` y este componente las observa, igual que `data-section-bg`. Así no
+ * hay que cablear un provider ni que las secciones sepan que existe un canvas.
+ *
+ * Lo que se guarda en estado es CUÁL sección está activa, no la palabra. La
+ * palabra se deriva del diccionario en cada render, así que cambiar de idioma la
+ * actualiza sola. Guardando la cadena, el 3D se quedaba con el idioma anterior
+ * hasta que el usuario saliera y volviera a entrar a la sección.
  */
 export function BackgroundCanvas() {
   const { scroller } = useScroll();
   const prefersReducedMotion = usePrefersReducedMotion();
   const tier = useQualityTier();
+  const content = useContent();
   const [progress] = useState(createProgressStore);
-  const [word, setWord] = useState<string | null>(null);
+  const [slot, setSlot] = useState<TypeSlot | null>(null);
 
   useEffect(() => {
     if (!scroller) return;
@@ -43,9 +57,10 @@ export function BackgroundCanvas() {
         },
         onToggle: (self) => {
           progress.active = self.isActive;
-          // La palabra solo cambia al entrar o salir de una sección: son dos o
-          // tres veces en toda la página, así que el estado de React va bien.
-          setWord(self.isActive ? (section.dataset.type3d ?? null) : null);
+          // Solo cambia al entrar o salir de una sección: dos o tres veces en
+          // toda la página, así que el estado de React va bien.
+          const key = section.dataset.type3d;
+          setSlot(self.isActive && isTypeSlot(key) ? key : null);
         },
       }),
     );
@@ -54,10 +69,10 @@ export function BackgroundCanvas() {
     return () => {
       for (const trigger of triggers) trigger.kill();
     };
-    // `word` cambia con el idioma, así que hay que rehacer los triggers cuando
-    // el DOM se re-renderiza con el diccionario nuevo.
   }, [scroller, progress]);
 
+  const word =
+    slot === "hero" ? content.hero.type3d : slot === "contact" ? content.contact.type3d : null;
   const active = word !== null;
 
   return (

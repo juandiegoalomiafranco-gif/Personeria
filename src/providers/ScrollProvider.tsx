@@ -92,6 +92,35 @@ export function ScrollProvider({ containerRef, children }: ScrollProviderProps) 
     };
   }, [containerRef, prefersReducedMotion]);
 
+  // Llevar el foco a la vista.
+  //
+  // El navegador solo hace scroll automático hacia el elemento enfocado cuando
+  // el scroll es suyo. Aquí no lo es, así que al tabular hacia una propuesta que
+  // está más abajo el foco se iba a un elemento invisible y el usuario de
+  // teclado quedaba perdido.
+  useEffect(() => {
+    const { scroller, lenis } = value;
+    if (!scroller) return;
+
+    const onFocusIn = (event: FocusEvent) => {
+      const target = event.target;
+      if (!(target instanceof HTMLElement)) return;
+
+      const box = target.getBoundingClientRect();
+      const margin = window.innerHeight * 0.15;
+      if (box.top >= margin && box.bottom <= window.innerHeight - margin) return;
+
+      if (lenis) {
+        lenis.scrollTo(target, { offset: -window.innerHeight * 0.35 });
+      } else {
+        target.scrollIntoView({ block: "center", behavior: "auto" });
+      }
+    };
+
+    scroller.addEventListener("focusin", onFocusIn);
+    return () => scroller.removeEventListener("focusin", onFocusIn);
+  }, [value]);
+
   const memo = useMemo(() => value, [value]);
   return <ScrollContext.Provider value={memo}>{children}</ScrollContext.Provider>;
 }

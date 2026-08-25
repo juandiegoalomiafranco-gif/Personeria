@@ -23,7 +23,13 @@ export const ScrollArea = forwardRef<HTMLDivElement, { children: ReactNode }>(fu
         data-scroll-container
         className="no-scrollbar h-full w-full overflow-y-auto overscroll-contain"
       >
-        <div data-scroll-content>{children}</div>
+        {/* `main` va aquí y no envolviendo al Shell: el chrome fijo, los canvas
+            y el preloader son decorado, y meterlos dentro del landmark
+            principal obligaría a un lector de pantalla a atravesarlos para
+            llegar al contenido. */}
+        <main id="contenido" data-scroll-content>
+          {children}
+        </main>
       </div>
     </div>
   );

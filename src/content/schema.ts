@@ -107,5 +107,7 @@ export interface SiteContent {
     /** Coordenadas para el clima; la barra muestra la temperatura real. */
     readonly weather: { readonly latitude: number; readonly longitude: number };
     readonly localeToggleLabel: string;
+    /** Enlace de salto al contenido, visible solo con foco de teclado. */
+    readonly skipToContent: string;
   };
 }
