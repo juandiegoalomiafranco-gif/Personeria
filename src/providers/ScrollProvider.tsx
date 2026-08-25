@@ -65,9 +65,15 @@ export function ScrollProvider({ containerRef, children }: ScrollProviderProps) 
       // 0.1 deja una estela de ~1s: es el peso que tiene la referencia.
       lerp: 0.1,
       smoothWheel: true,
-      // El scroll táctil nativo ya tiene su propia inercia; duplicarla se siente
-      // resbaloso y rompe el gesto de "flick".
-      syncTouch: false,
+      // Lenis también maneja el táctil.
+      //
+      // Con `syncTouch: false` la idea era dejar la inercia nativa del sistema,
+      // pero sobre un contenedor propio no funciona: el rAF de Lenis reescribe
+      // la posición del scroll en cada frame y deshace lo que el dedo acababa de
+      // mover. El resultado era una página completamente inmóvil en el celular.
+      // Con `true` hay una sola fuente de verdad para la posición.
+      syncTouch: true,
+      touchMultiplier: 1.6,
     });
 
     // Envuelto en flecha en vez de pasar `ScrollTrigger.update` suelto: el
@@ -119,6 +125,70 @@ export function ScrollProvider({ containerRef, children }: ScrollProviderProps) 
 
     scroller.addEventListener("focusin", onFocusIn);
     return () => scroller.removeEventListener("focusin", onFocusIn);
+  }, [value]);
+
+  // Scroll con teclado.
+  //
+  // El navegador mueve un contenedor con las flechas solo cuando ese contenedor
+  // tiene el foco, y aquí el foco vive en los enlaces del contenido. Sin esto,
+  // las flechas, AvPág y Fin no movían la página en absoluto: quien no usa
+  // ratón se quedaba encerrado en el hero.
+  useEffect(() => {
+    const { scroller, lenis } = value;
+    if (!scroller) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+
+      // No secuestrar teclas mientras se escribe o dentro de un diálogo, que
+      // trae su propia navegación.
+      const target = event.target;
+      if (target instanceof HTMLElement) {
+        if (target.isContentEditable) return;
+        if (["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) return;
+        if (target.closest('[role="dialog"]:not([hidden])')) return;
+      }
+
+      const page = window.innerHeight * 0.9;
+      const step = window.innerHeight * 0.18;
+      const max = scroller.scrollHeight - scroller.clientHeight;
+      const current = lenis ? lenis.scroll : scroller.scrollTop;
+
+      let next: number | null = null;
+      switch (event.key) {
+        case "ArrowDown":
+          next = current + step;
+          break;
+        case "ArrowUp":
+          next = current - step;
+          break;
+        case "PageDown":
+          next = current + page;
+          break;
+        case "PageUp":
+          next = current - page;
+          break;
+        case "Home":
+          next = 0;
+          break;
+        case "End":
+          next = max;
+          break;
+        case " ":
+          next = current + (event.shiftKey ? -page : page);
+          break;
+        default:
+          return;
+      }
+
+      event.preventDefault();
+      const clamped = Math.min(max, Math.max(0, next));
+      if (lenis) lenis.scrollTo(clamped);
+      else scroller.scrollTo({ top: clamped, behavior: "smooth" });
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
   }, [value]);
 
   const memo = useMemo(() => value, [value]);

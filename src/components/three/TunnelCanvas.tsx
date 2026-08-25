@@ -53,6 +53,11 @@ export function TunnelCanvas({ phrases, progress }: TunnelCanvasProps) {
         camera={{ position: [0, 0, 0], fov: 72, near: 0.1, far: 200 }}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         dpr={[1, MAX_DPR[tier]]}
+        // Decorativo: nunca recibe input. r3f pone `pointer-events: auto` en
+        // línea sobre su contenedor, y como este canvas está fijo por encima de
+        // toda la página, se comía la rueda del ratón antes de que llegara al
+        // contenedor de scroll — la página entera quedaba inmóvil.
+        style={{ pointerEvents: "none" }}
       >
         <HyperspaceTunnel progress={progress} count={streakCount} />
         <TunnelRings progress={progress} />

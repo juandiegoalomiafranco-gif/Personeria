@@ -39,6 +39,23 @@ de secciones y el stack.
   emitan `var(--token)` en vez de copiar el valor, que es lo que permite el
   cambio de tema y de fondo en runtime.
 
+## Cómo probar el scroll
+
+Nunca verifiques el scroll con `element.scrollTo()`. Eso escribe la posición
+directamente y se salta todo el camino real del input: Lenis, los listeners y
+cualquier overlay que esté tapando la página. Con ese método el sitio pasó todas
+las pruebas mientras estaba completamente inmóvil para un usuario.
+
+Usa entrada de verdad:
+
+- rueda: `page.mouse.wheel(0, 400)`
+- táctil: `Input.dispatchTouchEvent` por CDP (`page.touchscreen` solo hace tap)
+- teclado: `page.keyboard.press('PageDown' | 'End')`
+
+Y ojo con el viewport de los perfiles de dispositivo: el de `iPhone 13` en
+Playwright mide 390x664, no 390x844. Tocar por debajo de 664 no llega a la
+página y parece un bug que no existe.
+
 ## Verificar antes de subir
 
 ```bash
