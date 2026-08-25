@@ -1,0 +1,30 @@
+# dependencias
+node_modules
+.pnp
+.pnp.*
+
+# build
+.next
+out
+build
+next-env.d.ts
+*.tsbuildinfo
+
+# entorno
+.env
+.env.local
+.env.*.local
+
+# sistema
+.DS_Store
+*.pem
+npm-debug.log*
+yarn-error.log*
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# claude
+.claude/settings.local.json

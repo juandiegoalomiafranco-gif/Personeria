@@ -1,0 +1,238 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   TOKENS
+   Los valores crudos viven en :root para poder cambiarlos en runtime (tema y
+   fondo por sección). `@theme inline` los expone a Tailwind SIN copiar el valor,
+   de modo que `text-l1` emita `color: var(--label-1)` y siga la variable viva.
+   ========================================================================== */
+
+:root {
+  /* Fondos de sección. El shell interpola entre estos con el scroll. */
+  --bg-deep: #04123f; /* hero y contacto */
+  --bg-void: #000000; /* manifiesto, propuestas y túnel */
+  --bg: var(--bg-deep);
+
+  /* Jerarquía de texto. */
+  --label-1: #ffffff;
+  --label-2: rgb(255 255 255 / 0.62);
+  --label-3: rgb(255 255 255 / 0.3);
+
+  /* Acento lima: cursor, etiquetas de propuesta y anillos del túnel. */
+  --accent: #c0fe04;
+  --on-accent: #000000;
+
+  /* Retícula técnica y bordes punteados del hover. */
+  --line: rgb(255 255 255 / 0.09);
+  --line-strong: rgb(255 255 255 / 0.22);
+
+  /* Tipografía 3D del fondo. */
+  --type3d-base: #2e34b7;
+  --type3d-light: #4a50e0;
+
+  /* Paleta del túnel. */
+  --tunnel-cyan: #22e0e8;
+  --tunnel-blue: #2b6cf5;
+  --tunnel-violet: #7b3ff2;
+  --tunnel-magenta: #d43ff2;
+  --tunnel-white: #ffffff;
+
+  /* Familias tipográficas. Las variables --font-* las inyecta next/font. */
+  --font-sans-stack: var(--font-roboto-flex), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-mono-stack: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+  --font-mono-2-stack: var(--font-martian-mono), var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Ritmo del layout. */
+  --gutter: 1rem; /* px-4 */
+  --gutter-lg: 3.5rem; /* lg:px-14 */
+  --rhythm: 4.5rem; /* py-18 */
+  --rhythm-lg: 6rem; /* lg:py-24 */
+
+  /* Curvas exactas extraídas de la referencia. */
+  --ease-preloader-fill: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-preloader-fade: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-signature: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --duration-hover: 200ms;
+  --duration-theme: 300ms;
+
+  color-scheme: dark;
+}
+
+/* Tema claro. Solo se redefinen los tokens; ninguna regla de componente cambia. */
+:root[data-theme="light"] {
+  --bg-deep: #e9eaf2;
+  --bg-void: #ffffff;
+  --label-1: #050a1f;
+  --label-2: rgb(5 10 31 / 0.62);
+  --label-3: rgb(5 10 31 / 0.3);
+  --line: rgb(5 10 31 / 0.1);
+  --line-strong: rgb(5 10 31 / 0.24);
+  --accent: #4d6b00;
+  --on-accent: #ffffff;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-deep: var(--bg-deep);
+  --color-bg-void: var(--bg-void);
+
+  --color-l1: var(--label-1);
+  --color-l2: var(--label-2);
+  --color-l3: var(--label-3);
+
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --font-sans: var(--font-sans-stack);
+  --font-mono: var(--font-mono-stack);
+  --font-mono-2: var(--font-mono-2-stack);
+
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ==========================================================================
+   BASE
+   ========================================================================== */
+
+@layer base {
+  * {
+    min-width: 0; /* evita que los hijos de grid/flex desborden */
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--label-1);
+    font-family: var(--font-sans-stack);
+    overscroll-behavior: none;
+    transition: background-color var(--duration-theme) ease-out;
+  }
+
+  /* El shell monta su propio contenedor de scroll: el body nunca scrollea. */
+  html,
+  body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--on-accent);
+  }
+
+  /* El cursor del sistema se reemplaza por el cuadrito lima. */
+  :where(html.has-custom-cursor, html.has-custom-cursor *) {
+    cursor: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+}
+
+/* ==========================================================================
+   UTILIDADES
+   ========================================================================== */
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Rectángulo punteado que aparece al hover. Solo en punteros finos: en touch
+   el hover se queda "pegado" después del tap. */
+@utility dotted-target {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 2px dotted transparent;
+    pointer-events: none;
+    transition: border-color var(--duration-hover) ease-out;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover::before {
+      border-color: var(--label-1);
+    }
+  }
+
+  &:active::before {
+    border-color: var(--label-1);
+  }
+}
+
+/* Máscara para el reveal de texto: el hijo se traslada desde abajo del borde. */
+@utility reveal-mask {
+  display: block;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   ANIMACIONES CSS
+   ========================================================================== */
+
+@keyframes signature-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes signature-show {
+  to {
+    opacity: 1;
+  }
+}
+
+.svg-sign__path {
+  opacity: 0;
+  fill: none;
+  stroke-linecap: butt;
+}
+
+.svg-sign.is-drawing .svg-sign__path {
+  animation:
+    signature-show 0s linear var(--path-delay) forwards,
+    signature-draw var(--path-dur) var(--ease-signature) var(--path-delay) forwards;
+}
+
+/* ==========================================================================
+   MOVIMIENTO REDUCIDO
+   Regla del proyecto: con reduce activo, el contenido queda visible y estático.
+   Nunca escondido a la espera de una animación que no va a correr.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .svg-sign.is-drawing .svg-sign__path {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
