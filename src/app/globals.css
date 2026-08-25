@@ -180,10 +180,17 @@
   }
 }
 
-/* Máscara para el reveal de texto: el hijo se traslada desde abajo del borde. */
+/* Máscara para el reveal de texto: el hijo se traslada desde abajo del borde.
+
+   El colchón vertical existe porque las mayúsculas acentuadas del español (Á, Ó,
+   Ñ) sobresalen del em-box: con `leading-none` y `overflow: hidden` la máscara
+   les corta la tilde. El padding abre el hueco y el margen negativo lo devuelve,
+   así el ritmo del layout no cambia. */
 @utility reveal-mask {
   display: block;
   overflow: hidden;
+  padding-top: 0.14em;
+  margin-top: -0.14em;
 }
 
 /* ==========================================================================

@@ -35,7 +35,7 @@ export const es: SiteContent = {
 
   manifesto: {
     image: {
-      src: "/images/portrait.jpg",
+      src: "/images/portrait.png",
       alt: "Retrato del candidato",
     },
     primary: [
@@ -109,7 +109,7 @@ export const es: SiteContent = {
   },
 
   contact: {
-    headline: ["Vamos a", "Construir", "algo", "extraordinario"],
+    headline: ["Vamos a", "Crear", "algo", "extraordinario"],
     type3d: "TU VOZ",
     email: "hola@personeria2026.co",
     socials: [

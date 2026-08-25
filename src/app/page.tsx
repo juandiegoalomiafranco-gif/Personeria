@@ -1,18 +1,24 @@
-import { getContent } from "@/content";
+import { Hero } from "@/components/sections/Hero";
+import { Manifesto } from "@/components/sections/Manifesto";
+import { WorkGrid } from "@/components/sections/WorkGrid";
+import { Tunnel } from "@/components/sections/Tunnel";
+import { Contact } from "@/components/sections/Contact";
 
+/**
+ * Composición de la página.
+ *
+ * El orden de las secciones es la coreografía: azul → negro → negro → negro →
+ * azul. El `data-section-bg` de cada una es lo que la Fase 4 lee para interpolar
+ * el fondo con el scroll.
+ */
 export default function Page() {
-  const content = getContent();
-
   return (
-    <main className="flex h-dvh w-full flex-col items-center justify-center gap-4 px-4">
-      <p className="font-mono-2 text-l3 text-xs uppercase">Fase 0 — fundación</p>
-      <h1
-        className="text-l1 text-center text-[7.2svw] leading-none font-bold uppercase lg:text-[6svw]"
-        style={{ fontVariationSettings: '"wdth" 120' }}
-      >
-        {content.brand.name}
-        {content.brand.suffix}
-      </h1>
-    </main>
+    <>
+      <Hero />
+      <Manifesto />
+      <WorkGrid />
+      <Tunnel />
+      <Contact />
+    </>
   );
 }

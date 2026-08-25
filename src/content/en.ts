@@ -31,7 +31,7 @@ export const en: SiteContent = {
 
   manifesto: {
     image: {
-      src: "/images/portrait.jpg",
+      src: "/images/portrait.png",
       alt: "Portrait of the candidate",
     },
     primary: [
