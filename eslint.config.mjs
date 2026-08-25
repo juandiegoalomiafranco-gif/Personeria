@@ -52,10 +52,14 @@ export default tseslint.config(
     },
   },
 
-  // Los archivos de configuración corren en Node, fuera del proyecto TS.
+  // Los archivos de configuración y los scripts de build corren en Node, fuera
+  // del proyecto TS, así que no hay información de tipos que usar.
   {
-    files: ["*.config.{mjs,ts,js}", "eslint.config.mjs"],
+    files: ["*.config.{mjs,ts,js}", "eslint.config.mjs", "scripts/**/*.{mjs,js}"],
     extends: [tseslint.configs.disableTypeChecked],
+    languageOptions: {
+      globals: { process: "readonly", console: "readonly" },
+    },
   },
 
   // Prettier va último: apaga toda regla de formato que pelearía con él.

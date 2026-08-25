@@ -8,6 +8,7 @@ import { PointerProvider } from "@/providers/PointerProvider";
 import { ScrollProvider } from "@/providers/ScrollProvider";
 import { StageProvider, useStage } from "@/providers/StageProvider";
 import { ScrollChoreography } from "@/components/animation/ScrollChoreography";
+import { BackgroundCanvas } from "@/components/three/BackgroundCanvas";
 import { Cursor } from "@/components/ui/Cursor";
 import { Chrome } from "./Chrome";
 import { GridOverlay } from "./GridOverlay";
@@ -23,12 +24,13 @@ import { ScrollArea } from "./ScrollArea";
  * `Stage` y no aquí.
  *
  * Orden de capas (z-index):
+ *   -1   canvas de la tipografía 3D
  *   0    retícula técnica
  *   10   contenido de la página
  *   50   chrome (header y barra inferior)
  *   90   preloader
  *   100  cursor
- * Los canvas WebGL entran en la Fase 5: el de fondo en -1, el de frente en 30.
+ *   30   canvas del túnel (por encima del chrome, a propósito)
  */
 export function Shell({ children }: { children: ReactNode }) {
   return (
@@ -52,6 +54,7 @@ function Stage({ children }: { children: ReactNode }) {
 
   return (
     <ScrollProvider containerRef={containerRef}>
+      <BackgroundCanvas />
       <GridOverlay />
       <ScrollArea ref={containerRef}>{children}</ScrollArea>
       <Chrome />
