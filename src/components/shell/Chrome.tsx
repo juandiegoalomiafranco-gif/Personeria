@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { LocaleToggle } from "@/components/ui/LocaleToggle";
 import { DOTTED } from "@/components/ui/dotted";
 import { cn } from "@/lib/utils";
+import { MobileMenu } from "./MobileMenu";
 import { CoordReadout } from "./CoordReadout";
 import { ClockTemp } from "./ClockTemp";
 
@@ -34,10 +35,12 @@ export function Chrome() {
           {brand.suffix}
         </Link>
 
-        <nav // El ancho se calcula del contenido: las etiquetas en español son más largas
-          // que las inglesas de la referencia y con `basis-1/3` se partían en dos filas.
-          className="pointer-events-auto hidden basis-1/2 items-center justify-between gap-x-3 whitespace-nowrap lg:flex xl:basis-[48%]"
-        >
+        <MobileMenu />
+
+        {/* El ancho sale de `basis` y no del contenido: las etiquetas en español
+            son más largas que las inglesas de la referencia y con `basis-1/3`
+            se partían en dos filas. */}
+        <nav className="pointer-events-auto hidden basis-1/2 items-center justify-between gap-x-3 whitespace-nowrap lg:flex xl:basis-[48%]">
           <a href="#propuestas" className={DOTTED}>
             {nav.work}
           </a>

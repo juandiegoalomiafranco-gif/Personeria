@@ -20,6 +20,8 @@ export const es: SiteContent = {
     work: "Propuestas",
     contact: "Contacto",
     theme: "Tema",
+    menu: "Menú",
+    closeMenu: "Cerrar",
     sound: "Sonido",
   },
 

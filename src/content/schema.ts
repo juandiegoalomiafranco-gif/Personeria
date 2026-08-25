@@ -59,6 +59,9 @@ export interface SiteContent {
     /** Etiqueta del switch de tema; la letra del atajo se añade aparte. */
     readonly theme: string;
     readonly sound: string;
+    /** Etiqueta del botón que abre el menú en pantallas pequeñas. */
+    readonly menu: string;
+    readonly closeMenu: string;
   };
 
   readonly hero: {

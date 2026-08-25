@@ -16,6 +16,8 @@ export const en: SiteContent = {
     work: "Platform",
     contact: "Contact",
     theme: "Theme",
+    menu: "Menu",
+    closeMenu: "Close",
     sound: "Sound",
   },
 
