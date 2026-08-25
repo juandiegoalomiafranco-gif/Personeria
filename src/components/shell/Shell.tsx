@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useRef, type ReactNode } from "react";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { LocaleProvider } from "@/providers/LocaleProvider";
@@ -8,14 +9,31 @@ import { PointerProvider } from "@/providers/PointerProvider";
 import { ScrollProvider } from "@/providers/ScrollProvider";
 import { StageProvider, useStage } from "@/providers/StageProvider";
 import { ScrollChoreography } from "@/components/animation/ScrollChoreography";
-import { BackgroundCanvas } from "@/components/three/BackgroundCanvas";
-import { ForegroundCanvas } from "@/components/three/ForegroundCanvas";
 import { Cursor } from "@/components/ui/Cursor";
 import { Chrome } from "./Chrome";
 import { GridOverlay } from "./GridOverlay";
 import { Preloader } from "./Preloader";
 import { SkipLink } from "./SkipLink";
 import { ScrollArea } from "./ScrollArea";
+
+/**
+ * Los canvas se cargan aparte.
+ *
+ * three, drei y rapier suman más de un megabyte. Importándolos de forma normal
+ * entraban en el bundle inicial y el sitio no era interactivo hasta que
+ * terminaba de descargarlos — en el celular de alguien con datos móviles, eso
+ * son varios segundos de pantalla en blanco. Así el texto se lee de inmediato y
+ * el 3D llega después.
+ */
+const BackgroundCanvas = dynamic(
+  () => import("@/components/three/BackgroundCanvas").then((m) => m.BackgroundCanvas),
+  { ssr: false },
+);
+
+const ForegroundCanvas = dynamic(
+  () => import("@/components/three/ForegroundCanvas").then((m) => m.ForegroundCanvas),
+  { ssr: false },
+);
 
 /**
  * Raíz del cliente: providers, chrome fijo y contenedor de scroll.
@@ -53,7 +71,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
 function Stage({ children }: { children: ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { markReady } = useStage();
+  const { ready, markReady } = useStage();
 
   return (
     <ScrollProvider containerRef={containerRef}>
@@ -63,10 +81,13 @@ function Stage({ children }: { children: ReactNode }) {
           usuario de teclado tenía que tabular por las diez propuestas antes de
           llegar al menú. */}
       <Chrome />
-      <BackgroundCanvas />
+      {/* Los canvas esperan a que termine el preloader. Montarlos antes hace que
+          la descarga de three compita con la de las fuentes, y lo que el
+          usuario necesita primero es leer. */}
+      {ready ? <BackgroundCanvas /> : null}
       <GridOverlay />
       <ScrollArea ref={containerRef}>{children}</ScrollArea>
-      <ForegroundCanvas />
+      {ready ? <ForegroundCanvas /> : null}
       <Preloader onDone={markReady} />
       <Cursor />
       <ScrollChoreography />

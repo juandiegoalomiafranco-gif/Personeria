@@ -46,6 +46,13 @@ npm run check   # typecheck + lint + format
 npm run build
 ```
 
+## Presupuesto de bundle
+
+Los canvas se cargan con `dynamic()` y solo se montan cuando el preloader
+termina. three, drei y rapier suman ~810 KB comprimidos: si entran en el bundle
+inicial, el sitio no es interactivo hasta que terminan de bajar. Antes de añadir
+una dependencia al Shell, mira si puede vivir detrás de un `dynamic()`.
+
 ## Notas de compatibilidad
 
 - **ESLint fijado en 9.x.** El `eslint-plugin-react` que trae
