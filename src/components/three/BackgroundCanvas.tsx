@@ -5,9 +5,10 @@ import { Suspense, useEffect, useState } from "react";
 import { ScrollTrigger } from "@/lib/scroll/gsap";
 import { useScroll } from "@/providers/ScrollProvider";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
-import { MAX_DPR, useQualityTier } from "@/hooks/useQualityTier";
+import { AMBIENT_DPR, useQualityTier } from "@/hooks/useQualityTier";
 import { createProgressStore } from "@/lib/scroll/progress";
 import { useContent } from "@/providers/LocaleProvider";
+import { FrameCap } from "./FrameCap";
 import { InflatedType } from "./InflatedType";
 
 /** Secciones que pueden pedir tipografía 3D, en el orden de la página. */
@@ -56,7 +57,7 @@ export function BackgroundCanvas() {
           progress.value = self.progress;
         },
         onToggle: (self) => {
-          progress.active = self.isActive;
+          progress.setActive(self.isActive);
           // Solo cambia al entrar o salir de una sección: dos o tres veces en
           // toda la página, así que el estado de React va bien.
           const key = section.dataset.type3d;
@@ -83,16 +84,20 @@ export function BackgroundCanvas() {
     >
       {active ? (
         <Canvas
-          frameloop={prefersReducedMotion ? "demand" : "always"}
+          // Nunca `"always"`: el redibujado lo marca `FrameCap` a 30 fps para
+          // que un frame caro de WebGL no le robe su turno a Lenis. Con reduce
+          // activo no se monta el driver y el canvas dibuja una sola vez.
+          frameloop="demand"
           camera={{ position: [0, 0, 6.5], fov: 42 }}
           gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-          dpr={[1, MAX_DPR[tier]]}
+          dpr={[1, AMBIENT_DPR[tier]]}
           // Decorativo: nunca recibe input. r3f pone `pointer-events: auto` en
           // línea sobre su contenedor, y como este canvas está fijo por encima de
           // toda la página, se comía la rueda del ratón antes de que llegara al
           // contenedor de scroll — la página entera quedaba inmóvil.
           style={{ pointerEvents: "none" }}
         >
+          {prefersReducedMotion ? null : <FrameCap tier={tier} />}
           <Suspense fallback={null}>
             <InflatedType word={word} progress={progress} />
           </Suspense>

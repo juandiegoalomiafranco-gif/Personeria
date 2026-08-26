@@ -1,7 +1,7 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { useEffect, useState } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 import type { ProgressStore } from "@/lib/scroll/progress";
 import { MAX_DPR, scaleForTier, useQualityTier } from "@/hooks/useQualityTier";
 import { STREAK_COUNT } from "@/lib/three/tunnel";
@@ -25,22 +25,16 @@ interface TunnelCanvasProps {
  * seguiría dibujando 900 instancias durante todo el resto de la página.
  */
 export function TunnelCanvas({ phrases, progress }: TunnelCanvasProps) {
-  const [running, setRunning] = useState(false);
   const tier = useQualityTier();
   const streakCount = scaleForTier(STREAK_COUNT, tier);
 
-  // El store lo escribe ScrollTrigger fuera de React, así que hay que sondearlo
-  // para saber cuándo encender el bucle. Un rAF barato es suficiente: solo lee
-  // un booleano.
-  useEffect(() => {
-    let frame = 0;
-    const poll = () => {
-      setRunning((current) => (current === progress.active ? current : progress.active));
-      frame = requestAnimationFrame(poll);
-    };
-    frame = requestAnimationFrame(poll);
-    return () => cancelAnimationFrame(frame);
-  }, [progress]);
+  // El store lo escribe ScrollTrigger fuera de React, así que se lee por
+  // suscripción. Antes se sondeaba con un rAF que corría durante toda la vida
+  // de la página para leer un booleano que cambia dos veces; ahora solo se
+  // re-renderiza al entrar y al salir de la sección.
+  const subscribe = useCallback((onChange: () => void) => progress.subscribe(onChange), [progress]);
+  const getSnapshot = useCallback(() => progress.active, [progress]);
+  const running = useSyncExternalStore(subscribe, getSnapshot, () => false);
 
   return (
     <div

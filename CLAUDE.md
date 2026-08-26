@@ -34,6 +34,14 @@ de secciones y el stack.
   del header a propósito.
 - **El fondo de sección es una variable CSS** (`--bg`), interpolada por scroll.
   No pongas `background` en las secciones.
+- **Los canvas ambientales no dibujan a 60.** El de fondo y el de stickers van
+  en `frameloop="demand"` y los avanza `FrameCap` a 30 fps. Lenis interpola
+  dentro del mismo `requestAnimationFrame` que dibuja el WebGL, así que cada
+  frame caro de 3D es una actualización de scroll que no ocurre. No los pongas
+  en `"always"`. Y nunca uses el `advance()` de r3f para esto: sin argumento de
+  estado redibuja **todos** los roots ignorando su `frameloop`, y despierta el
+  túnel durante toda la página. El túnel sí se queda en `"always"`, porque su
+  movimiento está scrubbeado al scroll y a 30 se vería a saltos.
 - **Tailwind v4 sin archivo de config.** Los tokens están en `@theme inline`
   dentro de `src/app/globals.css`. `inline` es obligatorio: hace que las clases
   emitan `var(--token)` en vez de copiar el valor, que es lo que permite el

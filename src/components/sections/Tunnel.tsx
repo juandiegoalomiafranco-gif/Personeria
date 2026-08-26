@@ -54,7 +54,7 @@ export function Tunnel() {
       scrub: true,
       onUpdate: (self) => {
         progress.value = self.progress;
-        progress.active = self.isActive;
+        progress.setActive(self.isActive);
 
         // Los titulares se reparten en partes iguales del recorrido. Solo se
         // llama a setState cuando el índice cambia de verdad: son dos o tres
@@ -63,7 +63,7 @@ export function Tunnel() {
         setStatementIndex((current) => (current === next ? current : next));
       },
       onToggle: (self) => {
-        progress.active = self.isActive;
+        progress.setActive(self.isActive);
       },
     });
 

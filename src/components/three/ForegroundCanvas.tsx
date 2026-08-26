@@ -6,7 +6,8 @@ import { Suspense, useEffect, useState } from "react";
 import { ScrollTrigger } from "@/lib/scroll/gsap";
 import { useScroll } from "@/providers/ScrollProvider";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
-import { MAX_DPR, useQualityTier } from "@/hooks/useQualityTier";
+import { AMBIENT_DPR, useQualityTier } from "@/hooks/useQualityTier";
+import { FrameCap } from "./FrameCap";
 import { StickerField } from "./StickerField";
 
 /**
@@ -54,15 +55,20 @@ export function ForegroundCanvas() {
     >
       {active ? (
         <Canvas
+          // El redibujado lo marca `FrameCap` a 30 fps, no r3f: así la física
+          // de los stickers no compite con la interpolación del scroll. Con
+          // reduce activo este componente ni siquiera llega hasta aquí.
+          frameloop="demand"
           camera={{ position: [0, 0, 9], fov: 42 }}
           gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-          dpr={[1, MAX_DPR[tier]]}
+          dpr={[1, AMBIENT_DPR[tier]]}
           // Decorativo: nunca recibe input. r3f pone `pointer-events: auto` en
           // línea sobre su contenedor, y como este canvas está fijo por encima de
           // toda la página, se comía la rueda del ratón antes de que llegara al
           // contenedor de scroll — la página entera quedaba inmóvil.
           style={{ pointerEvents: "none" }}
         >
+          <FrameCap tier={tier} />
           <Suspense fallback={null}>
             {/* Mismo estudio que la tipografía 3D, para que los stickers
                 pertenezcan a la misma escena aunque estén en otro canvas. */}

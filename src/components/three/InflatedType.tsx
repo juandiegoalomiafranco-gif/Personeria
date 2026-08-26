@@ -6,6 +6,7 @@ import { useRef } from "react";
 import type { Group } from "three";
 import { MathUtils } from "three";
 import type { ProgressStore } from "@/lib/scroll/progress";
+import { useQualityTier, type QualityTier } from "@/hooks/useQualityTier";
 
 /** Ruta del JSON generado por `scripts/build-3d-font.mjs`. */
 const FONT = "/fonts/fredoka-semibold-3d.json";
@@ -14,23 +15,34 @@ const FONT = "/fonts/fredoka-semibold-3d.json";
  * Geometría de la letra.
  *
  * El look inflado sale del bevel, no del grosor: un bevel grande respecto a la
- * altura redondea el canto hasta que la letra parece un globo. `bevelSegments`
- * alto es lo que evita que el redondeo se vea facetado en los brillos.
+ * altura redondea el canto hasta que la letra parece un globo.
+ *
+ * La teselación se ajusta al dispositivo porque el coste se dispara rápido: es
+ * el producto de los segmentos de curva por los del bisel, sobre diez glifos
+ * llenos de curvas. Con 14 y 12 la palabra salía a **200.000 triángulos por
+ * frame**, y como Lenis comparte el rAF con el render, ese frame perdido se
+ * sentía como retraso en el scroll — la página parecía colgar de la rueda. Con
+ * 6 y 5 baja a unos 36.000 y el contorno se sigue viendo liso al tamaño al que
+ * se muestra.
  */
+const TESSELLATION: Record<QualityTier, { curveSegments: number; bevelSegments: number }> = {
+  high: { curveSegments: 6, bevelSegments: 5 },
+  medium: { curveSegments: 5, bevelSegments: 4 },
+  low: { curveSegments: 4, bevelSegments: 3 },
+};
+
 const GEOMETRY = {
   size: 1,
   // La profundidad tiene que ser bastante mayor que el doble del bevel: con
   // `depth` 0.42 y `bevelThickness` 0.2 los biseles frontal y trasero casi se
   // tocaban y las caras peleaban por el z-buffer, produciendo manchas.
   depth: 0.9,
-  curveSegments: 14,
   bevelEnabled: true,
   bevelThickness: 0.18,
   // `bevelSize` desplaza el contorno hacia dentro; pasado cierto punto se
   // autointersecta en las curvas cerradas de una tipografía redondeada.
   bevelSize: 0.1,
   bevelOffset: 0,
-  bevelSegments: 12,
 } as const;
 
 /** Velocidad de la deriva continua, en radianes por segundo. */
@@ -62,6 +74,8 @@ interface InflatedTypeProps {
 export function InflatedType({ word, progress }: InflatedTypeProps) {
   const groupRef = useRef<Group>(null);
   const elapsed = useRef(0);
+  const tier = useQualityTier();
+  const tessellation = TESSELLATION[tier];
 
   useFrame((_, rawDelta) => {
     const group = groupRef.current;
@@ -102,7 +116,7 @@ export function InflatedType({ word, progress }: InflatedTypeProps) {
       <group ref={groupRef} scale={FIT_WIDTH}>
         <Center>
           <Resize width>
-            <Text3D font={FONT} {...GEOMETRY}>
+            <Text3D font={FONT} {...GEOMETRY} {...tessellation}>
               {word}
               <meshPhysicalMaterial
                 color="#2e34b7"

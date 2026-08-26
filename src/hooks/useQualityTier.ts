@@ -29,11 +29,33 @@ const MULTIPLIER: Record<QualityTier, number> = {
   high: 1,
 };
 
-/** Techo de `devicePixelRatio` por escalón. Renderizar a 3x no aporta aquí. */
+/**
+ * Techo de `devicePixelRatio` del túnel.
+ *
+ * Renderizar a 3x no aporta aquí, y el coste del túnel es de relleno puro: 900
+ * estelas transparentes que se superponen, así que cada píxel se pinta muchas
+ * veces. Bajar el techo de 2 a 1.75 en `high` quita un 23% de fragmentos sin
+ * que se note en unas líneas que ya son un degradado.
+ */
 export const MAX_DPR: Record<QualityTier, number> = {
   low: 1.5,
   medium: 1.75,
-  high: 2,
+  high: 1.75,
+};
+
+/**
+ * Techo de `devicePixelRatio` de los canvas ambientales (tipografía y stickers).
+ *
+ * Va más bajo que el del túnel porque su coste no está en la geometría sino en
+ * el shader: `MeshPhysicalMaterial` con clearcoat e iridiscencia se evalúa por
+ * fragmento, y a dpr 2 en una pantalla de 1512x850 son 5,1 millones de
+ * fragmentos por frame. A 1.5 son 2,9 millones — casi la mitad — y sobre formas
+ * redondeadas con antialiasing la diferencia no se ve.
+ */
+export const AMBIENT_DPR: Record<QualityTier, number> = {
+  low: 1,
+  medium: 1.25,
+  high: 1.5,
 };
 
 export function useQualityTier(): QualityTier {

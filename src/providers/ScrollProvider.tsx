@@ -12,6 +12,7 @@ import {
 } from "react";
 import { gsap, ScrollTrigger } from "@/lib/scroll/gsap";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
+import { SCROLL_LERP, TOUCH_MULTIPLIER } from "@/lib/scroll/config";
 
 interface ScrollContextValue {
   /** El contenedor que realmente scrollea. `null` hasta que monta. */
@@ -62,8 +63,7 @@ export function ScrollProvider({ containerRef, children }: ScrollProviderProps) 
     const lenis = new Lenis({
       wrapper,
       content,
-      // 0.1 deja una estela de ~1s: es el peso que tiene la referencia.
-      lerp: 0.1,
+      lerp: SCROLL_LERP,
       smoothWheel: true,
       // Lenis también maneja el táctil.
       //
@@ -73,7 +73,7 @@ export function ScrollProvider({ containerRef, children }: ScrollProviderProps) 
       // mover. El resultado era una página completamente inmóvil en el celular.
       // Con `true` hay una sola fuente de verdad para la posición.
       syncTouch: true,
-      touchMultiplier: 1.6,
+      touchMultiplier: TOUCH_MULTIPLIER,
     });
 
     // Envuelto en flecha en vez de pasar `ScrollTrigger.update` suelto: el
