@@ -1,7 +1,8 @@
 import type { QualityTier } from "@/hooks/useQualityTier";
 
 /** Forma de cada sticker. Se mapea a una geometría en `Sticker.tsx`. */
-export type StickerShape = "coin" | "capsule" | "ring" | "gem" | "bolt" | "heart" | "cube";
+export type StickerShape =
+  "cursor" | "heart" | "spark" | "coin" | "ring" | "capsule" | "box" | "blob";
 
 export interface StickerSpec {
   readonly id: string;
@@ -24,22 +25,26 @@ export interface StickerSpec {
  * el conjunto se acomoda solo y ya nunca vuelve a estar igual.
  */
 export const STICKERS: readonly StickerSpec[] = [
-  { id: "coin", shape: "coin", color: "#c0fe04", size: 0.42, at: [-0.72, 0.55], mass: 1.4 },
-  { id: "bolt", shape: "bolt", color: "#8ea2ff", size: 0.4, at: [0.68, 0.62], mass: 0.8 },
-  { id: "heart", shape: "heart", color: "#ff4fa3", size: 0.36, at: [-0.55, -0.42], mass: 0.9 },
-  { id: "ring", shape: "ring", color: "#22e0e8", size: 0.38, at: [0.78, -0.28], mass: 1 },
+  // El reparto esquiva dos zonas: el titular de tres líneas abajo a la
+  // izquierda y el párrafo de intro arriba a la derecha. Cruzarse con el texto
+  // está bien —en la referencia el corazón pisa una palabra— pero sentarse
+  // encima de una letra se lee como un accidente, no como una decisión.
+  { id: "cursor", shape: "cursor", color: "#1fd07a", size: 0.62, at: [0.82, -0.12], mass: 1.2 },
+  { id: "heart", shape: "heart", color: "#ff4fa3", size: 0.38, at: [0.5, -0.66], mass: 0.9 },
+  { id: "ring", shape: "ring", color: "#22e8c4", size: 0.36, at: [0.04, 0.66], mass: 1 },
+  { id: "coin", shape: "coin", color: "#c0fe04", size: 0.4, at: [-0.62, 0.44], mass: 1.4 },
+  { id: "capsule", shape: "capsule", color: "#12b46a", size: 0.34, at: [-0.94, 0.2], mass: 1 },
   {
-    id: "gem",
-    shape: "gem",
+    id: "spark",
+    shape: "spark",
     color: "#ffffff",
-    size: 0.3,
-    at: [0.12, 0.72],
-    mass: 1.1,
+    size: 0.32,
+    at: [0.42, 0.74],
+    mass: 0.8,
     metal: true,
   },
-  { id: "capsule", shape: "capsule", color: "#4a50e0", size: 0.34, at: [-0.86, 0.05], mass: 1 },
-  { id: "cube", shape: "cube", color: "#c0fe04", size: 0.26, at: [0.45, -0.66], mass: 1.2 },
-  { id: "gem2", shape: "gem", color: "#d43ff2", size: 0.28, at: [-0.22, -0.78], mass: 0.9 },
+  { id: "box", shape: "box", color: "#6ee36b", size: 0.26, at: [0.3, -0.34], mass: 1.2 },
+  { id: "blob", shape: "blob", color: "#0e9e57", size: 0.24, at: [0.74, -0.74], mass: 0.9 },
 ];
 
 /** Cuántos stickers montar según el dispositivo. */
@@ -66,8 +71,11 @@ export const GRAVITY: readonly [number, number, number] = [0, 0, 0];
  * Sin él, el empujón del cursor los va desplazando y la composición se
  * desbalancea sola en un minuto. Con él vuelven despacio, sin que se note que
  * hay un ancla.
+ *
+ * A 0.16 la deriva ganaba igual y en unos segundos varios terminaban recortados
+ * contra el borde del encuadre, que es un accidente y se nota como tal.
  */
-export const HOME_SPRING = 0.16;
+export const HOME_SPRING = 0.3;
 
 /** Amplitud y velocidad de la deriva que los mantiene vivos cuando nadie toca. */
 export const DRIFT_FORCE = 0.02;

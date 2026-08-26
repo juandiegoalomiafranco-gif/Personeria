@@ -20,6 +20,17 @@ const BG_TOKENS: Record<string, string> = {
 };
 
 /**
+ * Intensidad del degradé del fondo por tono de sección.
+ *
+ * Los tramos negros de la referencia son negro puro: ahí la luz del fondo
+ * estorba, porque compite con las tarjetas y con el túnel.
+ */
+const GLOW_BY_TONE: Record<string, string> = {
+  deep: "1",
+  void: "0",
+};
+
+/**
  * Coreografía de scroll de toda la página.
  *
  * Va en un solo componente en vez de repartida por cada sección a propósito:
@@ -139,7 +150,10 @@ function applySectionBackgrounds() {
       start: "top 50%",
       end: "bottom 50%",
       onToggle: (self) => {
-        if (self.isActive) document.documentElement.style.setProperty("--bg", token);
+        if (!self.isActive) return;
+        const root = document.documentElement.style;
+        root.setProperty("--bg", token);
+        root.setProperty("--glow", GLOW_BY_TONE[section.dataset.sectionBg ?? ""] ?? "1");
       },
     });
   }

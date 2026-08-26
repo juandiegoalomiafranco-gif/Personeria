@@ -11,8 +11,14 @@ export const DEPTH = 70;
 /** Radio del disco donde nacen. Pequeño: la perspectiva es la que las abre. */
 export const SPAWN_RADIUS = 9;
 
-/** Cuántas estelas. 1200 se mueven cómodas en JS y llenan el encuadre. */
-export const STREAK_COUNT = 1200;
+/**
+ * Cuántas estelas.
+ *
+ * Suben con el adelgazamiento: una estela más fina cubre menos encuadre, y a
+ * 1200 el radial se quedaba ralo. El coste por instancia es el mismo — es un
+ * `InstancedMesh`, así que son 300 matrices más, no 300 draw calls más.
+ */
+export const STREAK_COUNT = 1500;
 
 /**
  * Grosor de la estela en pantalla, como fracción del alto del viewport.
@@ -22,7 +28,7 @@ export const STREAK_COUNT = 1200;
  * en mundo, la perspectiva engorda las estelas cercanas hasta volverlas manchas
  * y el radial deja de leerse — la referencia las mantiene finas de punta a punta.
  */
-export const STREAK_THICKNESS_K = 0.0042;
+export const STREAK_THICKNESS_K = 0.0018;
 
 /** Velocidad al entrar a la sección y al final, en unidades por segundo. */
 export const SPEED_MIN = 14;
@@ -33,14 +39,14 @@ export const STREAK_FACTOR = 0.085;
 
 /** Paleta de las estelas, en el orden en que se reparten. */
 export const STREAK_COLORS = [
-  "#22e0e8", // cian
-  "#2b6cf5", // azul eléctrico
-  "#7b3ff2", // violeta
-  "#d43ff2", // magenta
+  "#22e8c4", // aguamarina
+  "#12b46a", // esmeralda
+  "#6ee36b", // verde primavera
+  "#c0fe04", // lima, el acento del sitio
   "#ffffff", // blanco
 ] as const;
 
-/** Peso relativo de cada color. El cian domina, como en la referencia. */
+/** Peso relativo de cada color. El aguamarina domina, como el cian original. */
 export const STREAK_WEIGHTS = [0.42, 0.18, 0.16, 0.09, 0.15] as const;
 
 /** Anillos lima que se atraviesan. */

@@ -12,6 +12,11 @@ import type { QualityTier } from "@/hooks/useQualityTier";
  * y el frame que se ahorra queda para la interpolación de Lenis.
  */
 const TARGET_FPS: Record<QualityTier, number> = {
+  // Se probó a 60 en `high` y el arranque del scroll pasó de 969 a 1877 ms
+  // medido con rueda de verdad: el script inflado cuesta 61.000 triángulos por
+  // frame, más que la sans que sustituye, y a 60 vuelve a competir con Lenis
+  // por el mismo `requestAnimationFrame`. A 30 el giro de la palabra no se
+  // distingue y el scroll recupera su turno.
   high: 30,
   medium: 30,
   low: 24,

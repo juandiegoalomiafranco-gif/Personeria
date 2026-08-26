@@ -12,8 +12,9 @@ export const es: SiteContent = {
   },
 
   brand: {
-    name: "personería",
+    name: "mauro & juan diego",
     suffix: ".2026",
+    short: "m & jd.2026",
   },
 
   nav: {
@@ -32,7 +33,7 @@ export const es: SiteContent = {
       "Me postulo a la Personería porque el colegio funciona mejor cuando alguien se toma en serio los problemas pequeños. Fuera de clase construyo herramientas para que las cosas pasen más rápido.",
     ],
     headline: ["Traigo", "criterio & oficio", "a la representación"],
-    type3d: "PERSONERÍA",
+    type3d: "Mauro &\nJuan Diego",
   },
 
   manifesto: {
@@ -112,7 +113,7 @@ export const es: SiteContent = {
 
   contact: {
     headline: ["Vamos a", "Crear", "algo", "extraordinario"],
-    type3d: "TU VOZ",
+    type3d: "Tu Voz",
     email: "hola@personeria2026.co",
     socials: [
       { id: "instagram", label: "Instagram", href: "#" },

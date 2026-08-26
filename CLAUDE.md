@@ -42,6 +42,16 @@ de secciones y el stack.
   estado redibuja **todos** los roots ignorando su `frameloop`, y despierta el
   túnel durante toda la página. El túnel sí se queda en `"always"`, porque su
   movimiento está scrubbeado al scroll y a 30 se vería a saltos.
+- **`position: sticky` crea contexto de apilamiento.** El titular del túnel
+  tenía `z-40` y aun así las estelas le pasaban por encima: ese z-index solo
+  competía _dentro_ del div sticky, y el canvas es hermano suyo. El z-index va
+  en el elemento sticky, no en su hijo.
+- **El fondo degradado se mueve con `transform`, no cambiando el centro del
+  gradiente.** Recolocar el centro de un `radial-gradient` obliga a
+  rerasterizar a pantalla completa en cada frame; medido, eso subía el arranque
+  del scroll de 969 a casi 2000 ms. El foco vive en su propia capa
+  (`.backdrop__glow`) y solo se le escribe el `transform`, que resuelve el
+  compositor. Y solo cuando el puntero se movió de verdad.
 - **Tailwind v4 sin archivo de config.** Los tokens están en `@theme inline`
   dentro de `src/app/globals.css`. `inline` es obligatorio: hace que las clases
   emitan `var(--token)` en vez de copiar el valor, que es lo que permite el

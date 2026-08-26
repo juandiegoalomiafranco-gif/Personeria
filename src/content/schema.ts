@@ -51,6 +51,13 @@ export interface SiteContent {
     readonly name: string;
     /** Segunda mitad, se renderiza pegada a la primera. */
     readonly suffix: string;
+    /**
+     * Wordmark abreviado para pantallas pequeñas.
+     *
+     * Va completo, sufijo incluido: con dos nombres el largo se come la barra
+     * superior en móvil y empuja el botón del menú fuera del viewport.
+     */
+    readonly short: string;
   };
 
   readonly nav: {

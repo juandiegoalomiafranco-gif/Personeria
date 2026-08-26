@@ -82,19 +82,19 @@ export function ForegroundCanvas() {
                 intensity={2.4}
                 position={[0, 5, -6]}
                 scale={[12, 6, 1]}
-                color="#a9b8ff"
+                color="#8dffc4"
               />
               <Lightformer
                 intensity={1.4}
                 position={[-7, 1, 4]}
                 scale={[6, 6, 1]}
-                color="#ff4fa3"
+                color="#c0fe04"
               />
               <Lightformer
                 intensity={1.2}
                 position={[7, -2, 4]}
                 scale={[6, 6, 1]}
-                color="#22e0e8"
+                color="#22e8c4"
               />
               <Lightformer
                 intensity={2.4}

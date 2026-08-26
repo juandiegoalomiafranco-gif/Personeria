@@ -15,6 +15,7 @@ import { GridOverlay } from "./GridOverlay";
 import { Preloader } from "./Preloader";
 import { SkipLink } from "./SkipLink";
 import { ScrollArea } from "./ScrollArea";
+import { Backdrop } from "./Backdrop";
 
 /**
  * Los canvas se cargan aparte.
@@ -44,6 +45,7 @@ const ForegroundCanvas = dynamic(
  * `Stage` y no aquí.
  *
  * Orden de capas (z-index):
+ *   -2   fondo con degradé
  *   -1   canvas de la tipografía 3D
  *   0    retícula técnica
  *   10   contenido de la página
@@ -81,6 +83,10 @@ function Stage({ children }: { children: ReactNode }) {
           usuario de teclado tenía que tabular por las diez propuestas antes de
           llegar al menú. */}
       <Chrome />
+      {/* Detrás de todo, incluido el canvas de la tipografía. No espera al
+          preloader: es CSS, no pesa nada, y el degradé tiene que estar desde el
+          primer frame o se ve un salto de color al terminar la carga. */}
+      <Backdrop />
       {/* Los canvas esperan a que termine el preloader. Montarlos antes hace que
           la descarga de three compita con la de las fuentes, y lo que el
           usuario necesita primero es leer. */}

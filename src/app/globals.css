@@ -9,7 +9,7 @@
 
 :root {
   /* Fondos de sección. El shell interpola entre estos con el scroll. */
-  --bg-deep: #04123f; /* hero y contacto */
+  --bg-deep: #04251a; /* hero y contacto */
   --bg-void: #000000; /* manifiesto, propuestas y túnel */
   --bg: var(--bg-deep);
 
@@ -22,19 +22,28 @@
   --accent: #c0fe04;
   --on-accent: #000000;
 
+  /* Fondo con degradé. `--glow` lo conmuta el scroll: 1 en las secciones
+     profundas, 0 en las negras, para que los tramos negros sigan negros.
+     `--px`/`--py` los escribe `Backdrop` desde un rAF siguiendo al puntero. */
+  --glow: 1;
+  --glow-warm: #0e9e57;
+  --glow-cool: #0a6f7a;
+  --px: 50%;
+  --py: 38%;
+
   /* Retícula técnica y bordes punteados del hover. */
   --line: rgb(255 255 255 / 0.09);
   --line-strong: rgb(255 255 255 / 0.22);
 
   /* Tipografía 3D del fondo. */
-  --type3d-base: #2e34b7;
-  --type3d-light: #4a50e0;
+  --type3d-base: #0e9e57;
+  --type3d-light: #22c979;
 
   /* Paleta del túnel. */
-  --tunnel-cyan: #22e0e8;
-  --tunnel-blue: #2b6cf5;
-  --tunnel-violet: #7b3ff2;
-  --tunnel-magenta: #d43ff2;
+  --tunnel-cyan: #22e8c4;
+  --tunnel-blue: #12b46a;
+  --tunnel-violet: #6ee36b;
+  --tunnel-magenta: #c0fe04;
   --tunnel-white: #ffffff;
 
   /* Familias tipográficas. Las variables --font-* las inyecta next/font. */
@@ -62,13 +71,15 @@
 
 /* Tema claro. Solo se redefinen los tokens; ninguna regla de componente cambia. */
 :root[data-theme="light"] {
-  --bg-deep: #e9eaf2;
+  --bg-deep: #e8f2ea;
   --bg-void: #ffffff;
-  --label-1: #050a1f;
-  --label-2: rgb(5 10 31 / 0.62);
-  --label-3: rgb(5 10 31 / 0.3);
-  --line: rgb(5 10 31 / 0.1);
-  --line-strong: rgb(5 10 31 / 0.24);
+  --label-1: #04160d;
+  --label-2: rgb(4 22 13 / 0.62);
+  --label-3: rgb(4 22 13 / 0.3);
+  --line: rgb(4 22 13 / 0.1);
+  --line-strong: rgb(4 22 13 / 0.24);
+  --glow-warm: #7bd6a4;
+  --glow-cool: #a8dfd6;
   --accent: #4d6b00;
   --on-accent: #ffffff;
   color-scheme: light;
@@ -231,6 +242,79 @@
   animation:
     signature-show 0s linear var(--path-delay) forwards,
     signature-draw var(--path-dur) var(--ease-signature) var(--path-delay) forwards;
+}
+
+/* ==========================================================================
+   FONDO CON DEGRADÉ
+   Capas de luz por encima del color de `body`, que es quien pinta `--bg` y
+   quien lo transiciona al cambiar de sección. Aquí solo va el volumen.
+   ========================================================================== */
+
+.backdrop {
+  overflow: hidden;
+}
+
+.backdrop::before,
+.backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* `--glow` lo conmuta el scroll por sección: 1 en las profundas, 0 en las
+     negras. Más lento que el fondo (300ms) porque una luz que se apaga de
+     golpe se lee como un corte. */
+  opacity: var(--glow);
+  transition: opacity 520ms ease-out;
+}
+
+/* El foco anclado abajo a la derecha, para que la composición no quede
+   simétrica. Este no se mueve nunca, así que se rasteriza una sola vez. */
+.backdrop::before {
+  background: radial-gradient(
+    46rem 38rem at 88% 92%,
+    color-mix(in oklab, var(--glow-cool) 34%, transparent),
+    transparent 70%
+  );
+}
+
+/* El foco que sigue al puntero.
+   Va en su propia capa y se mueve con `transform` desde el rAF de `Backdrop`:
+   el gradiente se rasteriza una vez y el resto lo hace el compositor. Cambiarle
+   el centro al gradiente en su lugar repinta la pantalla entera cada frame y se
+   nota como retraso en el scroll. `left`/`top` en 0 y el propio elemento
+   centrado con `margin`, para que el transform sea la posición del puntero tal
+   cual. */
+.backdrop__glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 112rem;
+  height: 86rem;
+  margin: -43rem 0 0 -56rem;
+  opacity: var(--glow);
+  transition: opacity 520ms ease-out;
+  will-change: transform;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--glow-warm) 46%, transparent),
+    transparent 100%
+  );
+}
+
+/* Haces inclinados: la insinuación de una luz que entra fuera de cuadro. Las
+   paradas van muy separadas y a opacidad baja — en cuanto se marcan, dejan de
+   leerse como luz y pasan a leerse como rayas. */
+.backdrop::after {
+  background: linear-gradient(
+    104deg,
+    transparent 6%,
+    color-mix(in oklab, var(--glow-warm) 16%, transparent) 17%,
+    transparent 27%,
+    transparent 44%,
+    color-mix(in oklab, var(--glow-cool) 14%, transparent) 56%,
+    transparent 67%,
+    color-mix(in oklab, var(--glow-warm) 10%, transparent) 78%,
+    transparent 88%
+  );
 }
 
 /* ==========================================================================

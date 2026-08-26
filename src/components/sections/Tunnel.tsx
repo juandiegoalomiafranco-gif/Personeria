@@ -81,13 +81,20 @@ export function Tunnel() {
     >
       {!prefersReducedMotion ? <TunnelCanvas phrases={tunnel.phrases} progress={progress} /> : null}
 
-      <div className="sticky top-0 flex h-dvh w-full items-center justify-center px-4 py-18 lg:px-14 lg:py-24">
+      {/* El `z-40` va aquí, no en el `h2`.
+
+          `position: sticky` crea un contexto de apilamiento propio, así que
+          cualquier z-index de un hijo solo compite DENTRO de este div. El
+          canvas del túnel es hermano suyo con `z-30`, y sin este z-40 se
+          pintaba por encima del bloque entero: las estelas cruzaban por encima
+          de las letras del titular y lo dejaban ilegible. */}
+      <div className="sticky top-0 z-40 flex h-dvh w-full items-center justify-center px-4 py-18 lg:px-14 lg:py-24">
         {/* z-40 deja el titular por encima del canvas (z-30), que a su vez pasa
             por encima del chrome. Ese apilado es el de la referencia. */}
         <h2
           key={statementIndex}
           className={cn(
-            "relative z-40 flex flex-col items-center justify-center text-center",
+            "relative flex flex-col items-center justify-center text-center",
             "text-[7.2svw] leading-none font-bold uppercase lg:text-[6.8svw]",
             "[animation:statement-in_600ms_var(--ease-expo-out)_both]",
           )}

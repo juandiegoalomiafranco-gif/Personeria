@@ -8,8 +8,9 @@ export const en: SiteContent = {
   },
 
   brand: {
-    name: "personería",
+    name: "mauro & juan diego",
     suffix: ".2026",
+    short: "m & jd.2026",
   },
 
   nav: {
@@ -28,7 +29,7 @@ export const en: SiteContent = {
       "I'm running for Student Representative because school works better when someone takes the small problems seriously. Outside of class I build tools that make things move faster.",
     ],
     headline: ["I bring", "craft & judgment", "to representation"],
-    type3d: "PERSONERÍA",
+    type3d: "Mauro &\nJuan Diego",
   },
 
   manifesto: {
@@ -108,7 +109,7 @@ export const en: SiteContent = {
 
   contact: {
     headline: ["Let's", "Build", "something", "extraordinary"],
-    type3d: "YOUR VOICE",
+    type3d: "Your Voice",
     email: "hola@personeria2026.co",
     socials: [
       { id: "instagram", label: "Instagram", href: "#" },

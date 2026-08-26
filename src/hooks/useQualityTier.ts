@@ -54,8 +54,8 @@ export const MAX_DPR: Record<QualityTier, number> = {
  */
 export const AMBIENT_DPR: Record<QualityTier, number> = {
   low: 1,
-  medium: 1.25,
-  high: 1.5,
+  medium: 1.1,
+  high: 1.25,
 };
 
 export function useQualityTier(): QualityTier {

@@ -31,8 +31,14 @@ export function Chrome() {
           className={cn(DOTTED, "font-sans font-bold", "pointer-events-auto")}
           style={{ fontVariationSettings: '"wght" 700, "wdth" 120' }}
         >
-          {brand.name}
-          {brand.suffix}
+          {/* Con dos nombres el wordmark completo no cabe en la barra de un
+              móvil: empuja el botón del menú fuera del viewport. Debajo de `lg`
+              va la versión corta. */}
+          <span className="lg:hidden">{brand.short}</span>
+          <span className="hidden lg:inline">
+            {brand.name}
+            {brand.suffix}
+          </span>
         </Link>
 
         <MobileMenu />
