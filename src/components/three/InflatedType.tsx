@@ -2,57 +2,21 @@
 
 import { Center, Environment, Lightformer, Resize, Text3D } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { Group } from "three";
 import { MathUtils } from "three";
 import type { ProgressStore } from "@/lib/scroll/progress";
-import { useQualityTier, type QualityTier } from "@/hooks/useQualityTier";
+import { useQualityTier } from "@/hooks/useQualityTier";
+import {
+  GEOMETRY,
+  REFRACTION_PLANE,
+  TESSELLATION,
+  TYPE_FINISH,
+  createRefractionTexture,
+} from "@/lib/three/type3d";
 
 /** Ruta del JSON generado por `scripts/build-3d-font.mjs`. */
 const FONT = "/fonts/pacifico-3d.json";
-
-/**
- * Teselación de la letra, por escalón de calidad.
- *
- * Un script pide más segmentos que una sans recta: toda la letra es curva, así
- * que a 6 la panza de la `e` se ve poligonal — justo lo que hay que evitar. El
- * coste sigue acotado porque el bisel es fino: son 10 curvas y 5 de bisel, no el
- * 14x12 que llegó a costar 200.000 triángulos por frame y se sentía como
- * retraso del scroll.
- */
-const TESSELLATION: Record<QualityTier, { curveSegments: number; bevelSegments: number }> = {
-  high: { curveSegments: 8, bevelSegments: 5 },
-  medium: { curveSegments: 8, bevelSegments: 4 },
-  low: { curveSegments: 6, bevelSegments: 3 },
-};
-
-/**
- * Geometría de la letra: el inflado.
- *
- * En `ExtrudeGeometry` de three el bisel funciona así, y es lo que hace o
- * deshace el efecto globo:
- *
- * - `bevelOffset` desplaza **todo** el contorno hacia afuera. Es el que engorda
- *   el trazo, y el que convierte un script normal en un tubo.
- * - `bevelSize` hace que la **panza** sobresalga respecto a las caras frontal y
- *   trasera. Es el que da la sección redonda.
- *
- * Los dos cierran las contras de la `e`, la `o` y la `a`, que en un script son
- * pequeñas: la suma de ambos tiene que quedar por debajo de la mitad del hueco
- * o la letra se rellena sola y se ve como una mancha.
- *
- * Y `depth` tiene que ser mayor que el doble de `bevelThickness`: si no, los
- * biseles frontal y trasero casi se tocan, las caras pelean por el z-buffer y
- * salen manchas. Aquí 0.42 contra 0.28.
- */
-const GEOMETRY = {
-  size: 1,
-  depth: 0.42,
-  bevelEnabled: true,
-  bevelThickness: 0.14,
-  bevelSize: 0.032,
-  bevelOffset: 0.026,
-} as const;
 
 /** Velocidad de la deriva continua, en radianes por segundo. */
 const DRIFT_X = 0.055;
@@ -102,10 +66,19 @@ export function InflatedType({ word, progress }: InflatedTypeProps) {
   const groupRef = useRef<Group>(null);
   const elapsed = useRef(0);
   const tier = useQualityTier();
-  const tessellation = TESSELLATION[tier];
+  const tessellation = TESSELLATION[TYPE_FINISH][tier];
+  const geometry = GEOMETRY[TYPE_FINISH];
 
   const lines = useMemo(() => word.split("\n").filter(Boolean), [word]);
   const fit = lines.length > 1 ? FIT_WIDTH[2] : FIT_WIDTH[1];
+
+  // La textura solo se crea con acabado de cristal: en opaco no hay nada que
+  // refractar y el plano sería un dibujo tapado por las letras.
+  const refraction = useMemo(
+    () => (TYPE_FINISH === "glass" ? createRefractionTexture() : null),
+    [],
+  );
+  useEffect(() => () => refraction?.dispose(), [refraction]);
 
   useFrame((_, rawDelta) => {
     const group = groupRef.current;
@@ -128,20 +101,94 @@ export function InflatedType({ word, progress }: InflatedTypeProps) {
     group.position.z = MathUtils.lerp(0, -1.6, p);
   });
 
+  const material =
+    TYPE_FINISH === "glass" ? (
+      <meshPhysicalMaterial
+        // En cristal el tinte NO va en `color`: eso multiplicaría también la
+        // luz transmitida y ensucia el resultado. El verde entra por
+        // atenuación, que es como se tiñe el vidrio de verdad — cuanto más
+        // grueso el trazo, más saturado se ve.
+        //
+        // Con `attenuationDistance` corta (0.55) y `thickness` 2 el vidrio
+        // absorbía casi toda la luz y las letras salían negras y sucias. La
+        // distancia tiene que ser del orden del grosor del trazo, no menor.
+        color="#ffffff"
+        transmission={1}
+        thickness={0.9}
+        ior={1.5}
+        roughness={0.05}
+        metalness={0}
+        attenuationColor="#0e9e57"
+        attenuationDistance={2.6}
+        // La capa brillante encima es lo que da los reflejos duros del lomo.
+        // Sin ella el cristal se ve blando y pierde el filo.
+        clearcoat={1}
+        clearcoatRoughness={0.04}
+        iridescence={0.25}
+        iridescenceIOR={1.32}
+        envMapIntensity={2.4}
+        reflectivity={0.6}
+      />
+    ) : (
+      <meshPhysicalMaterial
+        color="#16b364"
+        // Cuerpo mate con una capa brillante encima: es lo que separa un globo
+        // de un plástico mojado. Con `roughness` bajísima el reflejo es duro y
+        // la letra pierde volumen.
+        roughness={0.19}
+        metalness={0.1}
+        clearcoat={1}
+        clearcoatRoughness={0.06}
+        // La iridiscencia alta produce manchas en las caras casi planas del
+        // bisel; con 0.28 se queda el tornasol de los bordes sin el moteado.
+        iridescence={0.28}
+        iridescenceIOR={1.32}
+        iridescenceThicknessRange={[180, 460]}
+        envMapIntensity={1.4}
+        reflectivity={0.75}
+      />
+    );
+
   return (
     <>
       {/*
-        Estudio construido con lightformers en vez de un HDR descargado: no hay
-        asset externo que cargar y se puede colocar cada brillo donde se quiere.
-        El verde es la luz principal; el lima y el cian dan los bordes.
+        Estudio construido con lightformers en vez de un HDR descargado. No es
+        por ahorrar: un preset de drei baja un HDRI de varios megas desde un CDN
+        externo, y aquí se puede colocar cada brillo exactamente donde se
+        quiere. El verde es la luz principal; el lima y el cian dan los bordes.
       */}
       <Environment resolution={256} frames={1}>
+        {/* La tira clave: ancha, brillante, arriba y por DELANTE. Es la que
+            dibuja el reflejo largo que recorre el lomo de cada trazo — el
+            detalle que separa un render de estudio de un plástico plano. En la
+            referencia se ve como una banda blanca continua sobre las letras. */}
+        <Lightformer
+          form="rect"
+          intensity={6}
+          position={[0, 5, 5]}
+          rotation={[-0.5, 0, 0]}
+          scale={[18, 2.2, 1]}
+          color="#ffffff"
+        />
         <Lightformer intensity={2.6} position={[0, 4, -6]} scale={[12, 7, 1]} color="#8dffc4" />
         <Lightformer intensity={1.5} position={[-7, 2, 3]} scale={[7, 7, 1]} color="#c0fe04" />
         <Lightformer intensity={1.3} position={[7, -2, 3]} scale={[7, 7, 1]} color="#22e8c4" />
         <Lightformer intensity={3.2} position={[0, -6, -4]} scale={[12, 3, 1]} color="#ffffff" />
         <Lightformer intensity={0.9} position={[0, 0, 8]} scale={[10, 10, 1]} color="#0e9e57" />
       </Environment>
+
+      {/*
+        Lo que el cristal refracta. Sin este plano la transmisión muestrea un
+        buffer vacío —el canvas es `alpha: true` y el degradé de la página es
+        CSS, por detrás— y las letras salen fantasmales en vez de vidriosas.
+        Lleva el mismo degradé que el fondo, así que taparlo no se nota.
+      */}
+      {refraction ? (
+        <mesh position={[0, 0, REFRACTION_PLANE.z]}>
+          <planeGeometry args={[REFRACTION_PLANE.width, REFRACTION_PLANE.height]} />
+          <meshBasicMaterial map={refraction} transparent toneMapped={false} />
+        </mesh>
+      ) : null}
 
       <group ref={groupRef} scale={fit} position={[0, lines.length > 1 ? LIFT : 0, 0]}>
         <Center>
@@ -152,27 +199,9 @@ export function InflatedType({ word, progress }: InflatedTypeProps) {
                 // descendentes de la `J` o la `g` no descuadran el bloque.
                 <group key={line} position={[0, ((lines.length - 1) / 2 - index) * LINE_GAP, 0]}>
                   <Center>
-                    <Text3D font={FONT} {...GEOMETRY} {...tessellation}>
+                    <Text3D font={FONT} {...geometry} {...tessellation}>
                       {line}
-                      <meshPhysicalMaterial
-                        color="#16b364"
-                        // Cuerpo mate con una capa brillante encima: es lo que
-                        // separa un globo de un plástico mojado. Con
-                        // `roughness` bajísima el reflejo es duro y la letra
-                        // pierde volumen.
-                        roughness={0.19}
-                        metalness={0.1}
-                        clearcoat={1}
-                        clearcoatRoughness={0.06}
-                        // La iridiscencia alta produce manchas en las caras
-                        // casi planas del bisel; con 0.28 se queda el tornasol
-                        // de los bordes sin el moteado.
-                        iridescence={0.28}
-                        iridescenceIOR={1.32}
-                        iridescenceThicknessRange={[180, 460]}
-                        envMapIntensity={1.4}
-                        reflectivity={0.75}
-                      />
+                      {material}
                     </Text3D>
                   </Center>
                 </group>
