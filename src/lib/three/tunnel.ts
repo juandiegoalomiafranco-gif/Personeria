@@ -49,6 +49,28 @@ export const STREAK_COLORS = [
 /** Peso relativo de cada color. El aguamarina domina, como el cian original. */
 export const STREAK_WEIGHTS = [0.42, 0.18, 0.16, 0.09, 0.15] as const;
 
+/**
+ * Reacción a la velocidad del scroll.
+ *
+ * Hasta aquí el largo de la estela dependía solo de la POSICIÓN dentro de la
+ * sección, así que al soltar la rueda las estelas se quedaban igual de largas
+ * y el túnel parecía una foto. Lo que vende el salto hiperespacial es que se
+ * estire cuando empujas y se recoja cuando paras.
+ */
+
+/**
+ * Cuánto se alarga la estela a velocidad máxima, como multiplicador.
+ *
+ * Se probó a 2.4 y las estelas se volvían barras que llenaban la pantalla y
+ * dejaban el titular ilegible. En la referencia, incluso a toda velocidad,
+ * siguen viéndose huecos negros entre estela y estela: el efecto es que
+ * atraviesas algo, no que la pantalla se pinta entera.
+ */
+export const VELOCITY_STRETCH = 1;
+
+/** Cuánto acelera el avance a velocidad máxima, como multiplicador. */
+export const VELOCITY_SPEED = 0.45;
+
 /** Anillos lima que se atraviesan. */
 export const RING_COUNT = 6;
 export const RING_RADIUS = 3.9;

@@ -318,6 +318,25 @@
 }
 
 /* ==========================================================================
+   PREVIEW DE PROPUESTA
+   ========================================================================== */
+
+/* Una vuelta cada 42 segundos: apenas se percibe de un vistazo, pero al volver
+   a mirar la tarjeta ya no está igual. Solo se anima el `transform`, así que lo
+   resuelve el compositor sin repintar — importante, porque son diez a la vez.
+   El bloque de movimiento reducido de abajo lo deja quieto. */
+.proposal-preview {
+  transform-origin: 50% 50%;
+  animation: proposal-drift 42s linear infinite;
+}
+
+@keyframes proposal-drift {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
    MOVIMIENTO REDUCIDO
    Regla del proyecto: con reduce activo, el contenido queda visible y estático.
    Nunca escondido a la espera de una animación que no va a correr.

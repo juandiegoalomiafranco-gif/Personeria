@@ -7,6 +7,7 @@ import { useScroll } from "@/providers/ScrollProvider";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { ScrollTrigger } from "@/lib/scroll/gsap";
 import { createProgressStore } from "@/lib/scroll/progress";
+import { VELOCITY_FULL } from "@/lib/scroll/config";
 import { cn } from "@/lib/utils";
 
 /**
@@ -55,6 +56,12 @@ export function Tunnel() {
       onUpdate: (self) => {
         progress.value = self.progress;
         progress.setActive(self.isActive);
+
+        // El pulso de velocidad. Se recorta a 1 porque `getVelocity()` devuelve
+        // píxeles por segundo sin techo —un golpe de rueda pasa de 5000 sin
+        // esfuerzo— y sin recortarlo las estelas se irían a longitudes
+        // absurdas en un solo frame. Quien lo baja es el bucle de render.
+        progress.pushVelocity(Math.min(1, Math.abs(self.getVelocity()) / VELOCITY_FULL));
 
         // Los titulares se reparten en partes iguales del recorrido. Solo se
         // llama a setState cuando el índice cambia de verdad: son dos o tres

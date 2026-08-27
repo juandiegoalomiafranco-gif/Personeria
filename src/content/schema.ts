@@ -32,6 +32,11 @@ export interface WorkItem {
   readonly external?: boolean;
   /** Palabra corta junto a la flecha en los externos, p. ej. "tools". */
   readonly externalLabel?: string;
+  /**
+   * Imagen de la propuesta. Si falta, la tarjeta dibuja un patrón generativo
+   * derivado del `id`, para que el grid nunca se vea a medio hacer.
+   */
+  readonly preview?: { readonly src: string; readonly alt: string };
 }
 
 export interface SocialLink {

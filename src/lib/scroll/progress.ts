@@ -1,3 +1,6 @@
+import { damp } from "@/lib/utils";
+import { VELOCITY_DECAY } from "./config";
+
 /**
  * Caja mutable para compartir el progreso del scroll con la escena 3D.
  *
@@ -14,6 +17,20 @@
 export interface ProgressStore {
   /** Progreso del pin, de 0 a 1. Se lee dentro de `useFrame`, no por React. */
   value: number;
+  /**
+   * Velocidad de scroll normalizada, de 0 a 1. Funciona como un pulso: la sube
+   * el `ScrollTrigger` mientras hay scroll y la baja el bucle de render.
+   *
+   * Tiene que decaer desde el render y no desde el trigger porque `onUpdate`
+   * **solo dispara mientras el scroll se mueve**. Al soltar la rueda deja de
+   * llamarse, y sin alguien que la baje se quedaría congelada en su último
+   * valor: las estelas del túnel se quedarían estiradas para siempre.
+   */
+  readonly velocity: number;
+  /** Sube el pulso. Lo llama el `ScrollTrigger` con su velocidad ya normalizada. */
+  pushVelocity(next: number): void;
+  /** Baja el pulso. Lo llama el bucle de render una vez por frame. */
+  decayVelocity(deltaSeconds: number): void;
   /** `true` mientras la sección está anclada, para poder apagar el render. */
   readonly active: boolean;
   /** Cambia `active` y avisa a los suscriptores. Ignora los valores repetidos. */
@@ -24,6 +41,7 @@ export interface ProgressStore {
 
 export function createProgressStore(): ProgressStore {
   const listeners = new Set<() => void>();
+  let velocity = 0;
   // En una variable de cierre y no en una propiedad del objeto: así el getter
   // puede exponerla como solo lectura y el único camino para escribirla es
   // `setActive`, que es el que notifica.
@@ -31,6 +49,18 @@ export function createProgressStore(): ProgressStore {
 
   return {
     value: 0,
+
+    get velocity() {
+      return velocity;
+    },
+
+    pushVelocity(next: number) {
+      velocity = next;
+    },
+
+    decayVelocity(deltaSeconds: number) {
+      velocity = damp(velocity, 0, VELOCITY_DECAY, deltaSeconds);
+    },
 
     get active() {
       return active;

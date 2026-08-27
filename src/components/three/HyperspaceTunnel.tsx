@@ -17,6 +17,8 @@ import {
   STREAK_THICKNESS_K,
   STREAK_WEIGHTS,
   speedCurve,
+  VELOCITY_SPEED,
+  VELOCITY_STRETCH,
   stageProgress,
 } from "@/lib/three/tunnel";
 
@@ -118,8 +120,18 @@ export function HyperspaceTunnel({ progress, count }: { progress: ProgressStore;
     const delta = Math.min(rawDelta, 0.05);
     const p = progress.value;
 
-    const speed = MathUtils.lerp(SPEED_MIN, SPEED_MAX, speedCurve(p));
-    const streakLength = Math.max(0.4, speed * STREAK_FACTOR);
+    // El pulso decae aquí, no en el `ScrollTrigger`: `onUpdate` solo dispara
+    // mientras el scroll se mueve, así que al soltar la rueda nadie volvería a
+    // tocarlo y las estelas se quedarían estiradas. Va por método y no
+    // escribiendo el campo porque `progress` es una prop, y el compilador de
+    // React prohíbe mutarlas.
+    progress.decayVelocity(delta);
+    const push = progress.velocity;
+
+    // Empujar y soltar: las estelas se estiran y aceleran con la velocidad del
+    // scroll, y vuelven solas a su largo de reposo al parar.
+    const speed = MathUtils.lerp(SPEED_MIN, SPEED_MAX, speedCurve(p)) * (1 + push * VELOCITY_SPEED);
+    const streakLength = Math.max(0.4, speed * STREAK_FACTOR * (1 + push * VELOCITY_STRETCH));
 
     // En el colapso final el disco de nacimiento se cierra: las estelas dejan de
     // abrirse y todo converge a un punto.

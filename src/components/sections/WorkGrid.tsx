@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useContent } from "@/providers/LocaleProvider";
+import { ProposalPreview } from "@/components/ui/ProposalPreview";
 
 /**
  * Posición de cada tarjeta dentro del grid de 12 columnas.
@@ -46,14 +48,26 @@ export function WorkGrid() {
               aria-label={`${item.title} — ${item.period}`}
               className="group block space-y-3 p-2"
             >
-              {/* Slot de media. Hasta que lleguen las imágenes reales de cada
-                  propuesta, se muestra un marco con su índice para que la
-                  composición del grid sea legible. */}
+              {/* Slot de media. Con imagen real la usa; si no, dibuja un
+                  patrón generativo derivado del `id`. Antes aquí solo había un
+                  marco vacío con un número, y la sección se leía como un
+                  wireframe sin terminar. */}
               <div
                 aria-hidden="true"
-                className="bg-line border-line-strong pointer-events-none relative flex aspect-square w-full items-center justify-center border select-none"
+                className="bg-line border-line-strong pointer-events-none relative aspect-square w-full overflow-hidden border select-none"
               >
-                <span className="font-mono-2 text-l3 text-xs tabular-nums">
+                {item.preview ? (
+                  <Image
+                    src={item.preview.src}
+                    alt=""
+                    fill
+                    sizes="(max-width: 1024px) 50vw, 25vw"
+                    className="object-cover"
+                  />
+                ) : (
+                  <ProposalPreview id={item.id} />
+                )}
+                <span className="font-mono-2 text-l3 absolute bottom-1 left-1.5 text-xs tabular-nums">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 {item.tag ? (
