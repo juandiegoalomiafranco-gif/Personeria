@@ -11,11 +11,16 @@ import { useContent } from "@/providers/LocaleProvider";
 import { FrameCap } from "./FrameCap";
 import { InflatedType } from "./InflatedType";
 
-/** Secciones que pueden pedir tipografía 3D, en el orden de la página. */
-type TypeSlot = "hero" | "contact";
+/**
+ * Secciones que pueden pedir tipografía 3D.
+ *
+ * Solo queda Contacto: el hero pasó a un shader de ruido como fondo y ya no
+ * declara `data-type3d`.
+ */
+type TypeSlot = "contact";
 
 function isTypeSlot(value: string | undefined): value is TypeSlot {
-  return value === "hero" || value === "contact";
+  return value === "contact";
 }
 
 /**
@@ -72,8 +77,7 @@ export function BackgroundCanvas() {
     };
   }, [scroller, progress]);
 
-  const word =
-    slot === "hero" ? content.hero.type3d : slot === "contact" ? content.contact.type3d : null;
+  const word = slot === "contact" ? content.contact.type3d : null;
   const active = word !== null;
 
   return (

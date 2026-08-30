@@ -52,15 +52,13 @@ export interface SiteContent {
   };
 
   readonly brand: {
-    /** Primera mitad del wordmark, en peso bold. */
+    /** Nombre completo. No se pinta: es la etiqueta accesible del wordmark. */
     readonly name: string;
-    /** Segunda mitad, se renderiza pegada a la primera. */
-    readonly suffix: string;
     /**
-     * Wordmark abreviado para pantallas pequeñas.
+     * Wordmark visible, en todos los tamaños.
      *
-     * Va completo, sufijo incluido: con dos nombres el largo se come la barra
-     * superior en móvil y empuja el botón del menú fuera del viewport.
+     * Va abreviado a propósito: el titular del hero ya dice los dos nombres
+     * completos, así que repetirlos en la barra solo resta.
      */
     readonly short: string;
   };
@@ -77,14 +75,15 @@ export interface SiteContent {
   };
 
   readonly hero: {
-    /** Dos líneas cortas en la columna izquierda. */
-    readonly eyebrow: readonly string[];
-    readonly tagline: string;
-    readonly intro: RichText;
-    /** Tres líneas del titular gigante. */
+    /**
+     * Titular gigante. Una entrada por línea: en móvil se apilan y a partir de
+     * `lg` se unen en una sola, que es el encuadre de la referencia.
+     */
     readonly headline: readonly string[];
-    /** Palabra que deletrea la tipografía 3D del fondo. */
-    readonly type3d: string;
+    /** Bloque monoespaciado centrado bajo el titular: qué, quiénes y dónde. */
+    readonly meta: readonly string[];
+    /** Etiqueta accesible del indicador de scroll. */
+    readonly scrollHint: string;
   };
 
   readonly manifesto: {

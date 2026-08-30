@@ -1,17 +1,23 @@
 "use client";
 
 import { useContent } from "@/providers/LocaleProvider";
-import { RevealLines } from "@/components/animation/RevealLines";
-import { RichText } from "@/components/animation/RichText";
+import { FitText } from "@/components/animation/FitText";
+import { HeroShader } from "@/components/three/HeroShader";
+import { ScrollHint } from "@/components/ui/ScrollHint";
 
 /**
  * Sección de apertura, a pantalla completa.
  *
- * Grid de dos filas: arriba el bloque de metadatos en tres columnas del grid de
- * 12, abajo el titular gigante anclado al pie con `self-end`. En móvil el orden
- * se invierte (`order-1` / `order-2`) para que el titular quede arriba.
+ * Una sola columna centrada: los dos nombres cruzando el ancho de la pantalla y
+ * debajo el bloque monoespaciado con la ficha de la candidatura. Nada más — la
+ * referencia apoya todo el peso en esas dos piezas.
  *
- * El fondo lo pinta el canvas 3D de la Fase 5; aquí solo va el texto.
+ * El fondo es el shader de ruido, no la tipografía 3D: el hero ya no declara
+ * `data-type3d` ni `data-stickers`, así que ni `InflatedType` ni los stickers de
+ * física se montan aquí. Ambos siguen vivos en Contacto.
+ *
+ * `data-section-bg="void"` deja `--bg` en negro y apaga el degradé del
+ * `Backdrop` (`--glow: 0`): el color de esta sección lo pone el shader.
  */
 export function Hero() {
   const { hero } = useContent();
@@ -19,35 +25,31 @@ export function Hero() {
   return (
     <section
       id="inicio"
-      data-section-bg="deep"
-      data-type3d="hero"
-      data-stickers
-      className="relative z-10 grid h-dvh w-full grid-cols-12 grid-rows-[auto_1fr] px-4 py-18 lg:h-screen lg:px-14 lg:py-24"
+      data-section-bg="void"
+      className="relative z-10 flex h-dvh w-full flex-col items-center justify-center overflow-hidden px-4 lg:h-screen lg:px-14"
     >
-      <div className="order-2 col-span-12 flex flex-col font-mono text-base lg:order-1 lg:grid lg:grid-cols-12">
-        <RevealLines
-          lines={hero.eyebrow}
-          className="hidden p-2 font-sans text-3xl leading-tight font-medium lg:col-span-3 lg:col-start-1 lg:block xl:col-span-2 xl:col-start-1"
+      <HeroShader />
+
+      <div className="relative z-10 flex w-full flex-col items-center">
+        <FitText
+          lines={hero.headline}
+          className="text-l1 text-center leading-[0.86] uppercase"
+          lineClassName="[font-variation-settings:'wght'_900,'wdth'_115] tracking-[-0.015em]"
+          fallbackSize="7svw"
         />
 
-        <span className="hidden text-balance lg:col-span-3 lg:col-start-4 lg:block xl:col-span-2 xl:col-start-5">
-          <span className="reveal-mask">
-            <span data-reveal-line className="block p-2">
-              {hero.tagline}
-            </span>
-          </span>
-        </span>
-
-        <p className="col-span-12 mt-auto p-2 lg:col-span-6 lg:col-start-7 lg:mt-0 xl:col-span-4 xl:col-start-9">
-          <RichText value={hero.intro} />
-        </p>
+        <ul className="text-l1 mt-5 flex flex-col items-center text-center font-mono text-[11px] leading-[1.55] tracking-[0.14em] uppercase lg:mt-7 lg:text-xs">
+          {hero.meta.map((line, index) => (
+            <li key={index} className="reveal-mask">
+              <span data-reveal-line className="block">
+                {line}
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
 
-      <RevealLines
-        lines={hero.headline}
-        className="order-1 col-span-12 self-end px-2 text-[7.2svw] leading-none font-bold uppercase lg:order-2 lg:text-[6svw] xl:text-[5.6svw] 2xl:text-[5svw]"
-        lineClassName="[font-variation-settings:'wdth'_120]"
-      />
+      <ScrollHint label={hero.scrollHint} />
     </section>
   );
 }

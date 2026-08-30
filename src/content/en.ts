@@ -9,8 +9,7 @@ export const en: SiteContent = {
 
   brand: {
     name: "mauro & juan diego",
-    suffix: ".2026",
-    short: "m & jd.2026",
+    short: "m & jd",
   },
 
   nav: {
@@ -23,13 +22,9 @@ export const en: SiteContent = {
   },
 
   hero: {
-    eyebrow: ["Listen &", "Resolve"],
-    tagline: "Thinking in systems. Building with care.",
-    intro: [
-      "I'm running for Student Representative because school works better when someone takes the small problems seriously. Outside of class I build tools that make things move faster.",
-    ],
-    headline: ["I bring", "craft & judgment", "to representation"],
-    type3d: "Mauro &\nJuan Diego",
+    headline: ["Mauro &", "Juan Diego"],
+    meta: ["Student Representative 2026-2027", "Joint ticket", "CCB"],
+    scrollHint: "Scroll to see the platform",
   },
 
   manifesto: {
