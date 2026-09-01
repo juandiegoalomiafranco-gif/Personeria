@@ -93,3 +93,13 @@ una dependencia al Shell, mira si puede vivir detrás de un `dynamic()`.
 - **ESLint fijado en 9.x.** El `eslint-plugin-react` que trae
   `eslint-config-next@16` no soporta la API de contexto de ESLint 10.
 - **TypeScript fijado en 5.9.** `typescript-eslint@8` todavía no acepta TS 7.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

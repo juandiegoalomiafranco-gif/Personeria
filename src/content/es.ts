@@ -13,8 +13,7 @@ export const es: SiteContent = {
 
   brand: {
     name: "mauro & juan diego",
-    suffix: ".2026",
-    short: "m & jd.2026",
+    short: "m & jd",
   },
 
   nav: {
@@ -27,13 +26,9 @@ export const es: SiteContent = {
   },
 
   hero: {
-    eyebrow: ["Escuchar &", "Resolver"],
-    tagline: "Pensar en sistemas. Construir con cuidado.",
-    intro: [
-      "Me postulo a la Personería porque el colegio funciona mejor cuando alguien se toma en serio los problemas pequeños. Fuera de clase construyo herramientas para que las cosas pasen más rápido.",
-    ],
-    headline: ["Traigo", "criterio & oficio", "a la representación"],
-    type3d: "Mauro &\nJuan Diego",
+    headline: ["Mauro &", "Juan Diego"],
+    meta: ["Personería 2026-2027", "Fórmula estudiantil", "CCB"],
+    scrollHint: "Desliza para ver la propuesta",
   },
 
   manifesto: {

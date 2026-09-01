@@ -9,9 +9,11 @@
 
 :root {
   /* Fondos de sección. El shell interpola entre estos con el scroll. */
-  --bg-deep: #04251a; /* hero y contacto */
-  --bg-void: #000000; /* manifiesto, propuestas y túnel */
-  --bg: var(--bg-deep);
+  --bg-deep: #04251a; /* contacto */
+  --bg-void: #000000; /* hero, manifiesto, propuestas y túnel */
+  /* Arranca en negro porque el hero es negro. Con `deep` de inicial había un
+     destello verde en el primer pintado, antes de que el scroll conmutara. */
+  --bg: var(--bg-void);
 
   /* Jerarquía de texto. */
   --label-1: #ffffff;
@@ -25,7 +27,7 @@
   /* Fondo con degradé. `--glow` lo conmuta el scroll: 1 en las secciones
      profundas, 0 en las negras, para que los tramos negros sigan negros.
      `--px`/`--py` los escribe `Backdrop` desde un rAF siguiendo al puntero. */
-  --glow: 1;
+  --glow: 0;
   --glow-warm: #0e9e57;
   --glow-cool: #0a6f7a;
   --px: 50%;
@@ -38,6 +40,14 @@
   /* Tipografía 3D del fondo. */
   --type3d-base: #0e9e57;
   --type3d-light: #22c979;
+
+  /* Shader de ruido del hero. Los lee `HeroShader` con `getComputedStyle`, que
+     es lo que permite que el tema claro los redefina sin tocar el GLSL. */
+  --hero-shader-bg: #000000;
+  --hero-shader-1: #86efac;
+  --hero-shader-2: #4ade80;
+  --hero-shader-3: #059669;
+  --hero-shader-4: #000000;
 
   /* Paleta del túnel. */
   --tunnel-cyan: #22e8c4;
@@ -63,8 +73,12 @@
   --ease-signature: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
 
+  --ease-cubic-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
   --duration-hover: 200ms;
   --duration-theme: 300ms;
+  /* Espejo de `DURATION.scrollHint`. */
+  --duration-scroll-hint: 2400ms;
 
   color-scheme: dark;
 }
@@ -82,6 +96,11 @@
   --glow-cool: #a8dfd6;
   --accent: #4d6b00;
   --on-accent: #ffffff;
+  --hero-shader-bg: #ffffff;
+  --hero-shader-1: #dcfce7;
+  --hero-shader-2: #bbf7d0;
+  --hero-shader-3: #86efac;
+  --hero-shader-4: #ffffff;
   color-scheme: light;
 }
 
@@ -218,6 +237,24 @@
     opacity: 1;
     transform: none;
   }
+}
+
+/* Indicador de scroll del hero. El bloque global de movimiento reducido de más
+   abajo lo detiene y deja el punto visible y quieto. */
+@keyframes scroll-hint {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateY(0.35rem);
+    opacity: 1;
+  }
+}
+
+.scroll-hint {
+  animation: scroll-hint var(--duration-scroll-hint) var(--ease-cubic-in-out) infinite;
 }
 
 @keyframes signature-draw {

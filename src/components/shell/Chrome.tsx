@@ -26,19 +26,16 @@ export function Chrome() {
     <header className="text-l1 font-mono-2 pointer-events-none fixed inset-0 z-50 flex flex-col justify-between">
       {/* Fila superior */}
       <div className="flex items-center justify-between px-4 py-4 text-sm lg:px-14 lg:py-7 lg:text-base">
+        {/* Abreviado en todos los tamaños: el titular del hero ya dice los dos
+            nombres completos y a tamaño gigante, así que repetirlos aquí solo
+            compite con él. El nombre entero se queda en la etiqueta accesible. */}
         <Link
           href="/"
+          aria-label={brand.name}
           className={cn(DOTTED, "font-sans font-bold", "pointer-events-auto")}
           style={{ fontVariationSettings: '"wght" 700, "wdth" 120' }}
         >
-          {/* Con dos nombres el wordmark completo no cabe en la barra de un
-              móvil: empuja el botón del menú fuera del viewport. Debajo de `lg`
-              va la versión corta. */}
-          <span className="lg:hidden">{brand.short}</span>
-          <span className="hidden lg:inline">
-            {brand.name}
-            {brand.suffix}
-          </span>
+          {brand.short}
         </Link>
 
         <MobileMenu />
