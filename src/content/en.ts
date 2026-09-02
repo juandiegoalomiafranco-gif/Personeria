@@ -89,16 +89,17 @@ export const en: SiteContent = {
   },
 
   tunnel: {
-    statements: [
-      ["Represent", "with", "purpose"],
-      ["Represent", "with a", "human touch"],
-      ["Students", "first"],
+    chapters: [
+      ["We're Mauro", "and Juan Diego,", "and we got tired", "of waiting"],
+      ["for someone else", "to fix what we all", "complain about", "in the hallway,"],
+      ["so we stopped", "complaining", "and wrote down", "what can be done:"],
+      ["proposals,", "with a date,", "a name on them,", "and a way to check."],
     ],
     phrases: [
-      "Building agreements that last.",
-      "Independent by design and conviction.",
-      "Clarity first. Noise second.",
-      "Ship in small steps. Aim for long arcs.",
+      "Nobody appointed us.",
+      "Listening is not a formality.",
+      "No promises we cannot keep.",
+      "Ask us again in March.",
     ],
   },
 

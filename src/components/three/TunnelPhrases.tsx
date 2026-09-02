@@ -6,7 +6,8 @@ import { useMemo, useRef } from "react";
 import type { Group, Mesh, MeshBasicMaterial } from "three";
 import { MathUtils } from "three";
 import type { ProgressStore } from "@/lib/scroll/progress";
-import { DEPTH, SPEED_MAX, SPEED_MIN, STAGE, speedCurve, stageProgress } from "@/lib/three/tunnel";
+import { chapterAt, createChapterCursor } from "@/lib/three/chapters";
+import { DEPTH, STAGE, stageProgress } from "@/lib/three/tunnel";
 
 /** Posición angular y radio de cada frase alrededor del eje del túnel. */
 const SLOTS = [
@@ -16,12 +17,23 @@ const SLOTS = [
   { angle: 5.35, radius: 7.4 },
 ] as const;
 
+/** Lo más cerca de la cámara que llega una frase. Más acá taparía el titular. */
+const NEAR_Z = -7;
+
 /**
- * Frases flotando dentro del túnel.
+ * Frases flotando dentro del túnel, una por capítulo.
  *
- * Van repartidas en círculo alrededor del eje y viajan con el flujo, así que
- * crecen al acercarse a la cámara y pasan de largo. Se reparten en profundidad
- * para que no lleguen todas a la vez.
+ * Van repartidas en círculo alrededor del eje y se acercan a la cámara, así que
+ * crecen conforme avanza su capítulo. Antes flotaban en un ciclo propio, sin
+ * relación con el titular que estaba en pantalla: dos textos compitiendo por la
+ * atención en el mismo encuadre. Ahora la frase *i* solo existe durante el
+ * capítulo *i*, y refuerza lo que se está leyendo.
+ *
+ * La profundidad la manda el scroll, no un acumulador: la `z` se calcula desde
+ * el progreso del capítulo en vez de sumarse frame a frame. Además de ser lo que
+ * pide un efecto scrubbeado, es lo que hace que al subir el scroll las frases
+ * retrocedan, y que un salto con `End` o `Home` las deje donde toca en vez de
+ * donde se quedaron.
  *
  * El texto real también está en el DOM (oculto) para lectores de pantalla: aquí
  * es solo geometría.
@@ -34,6 +46,7 @@ export function TunnelPhrases({
   progress: ProgressStore;
 }) {
   const groupRef = useRef<Group>(null);
+  const cursor = useMemo(() => createChapterCursor(), []);
 
   const slots = useMemo(
     () =>
@@ -43,38 +56,36 @@ export function TunnelPhrases({
           phrase,
           x: Math.cos(slot.angle) * slot.radius,
           y: Math.sin(slot.angle) * slot.radius * 0.62,
-          z: -DEPTH + (index * DEPTH) / Math.max(1, phrases.length),
         };
       }),
     [phrases],
   );
 
-  useFrame((_, rawDelta) => {
+  useFrame(() => {
     const group = groupRef.current;
     if (!group || !progress.active) return;
 
-    const delta = Math.min(rawDelta, 0.05);
     const p = progress.value;
-    // Las frases viajan más lento que las estelas: si fueran a la misma
-    // velocidad pasarían tan rápido que serían ilegibles.
-    const speed = MathUtils.lerp(SPEED_MIN, SPEED_MAX, speedCurve(p)) * 0.22;
-    const visibility = stageProgress(p, STAGE.phrases) * (1 - stageProgress(p, STAGE.fadeOut));
+    chapterAt(p, cursor);
+    const globalFade = 1 - stageProgress(p, STAGE.fadeOut);
 
-    for (const child of group.children) {
-      child.position.z += speed * delta;
-      if (child.position.z > 1) child.position.z = -DEPTH;
+    group.children.forEach((child, index) => {
+      // Cuánto lleva recorrido el capítulo de esta frase: 0 antes de empezar,
+      // 1 cuando ya pasó.
+      const t = Math.min(1, Math.max(0, cursor.position - index));
 
-      // Se desvanecen en los extremos: al fondo por lejanía, al frente al pasar
-      // junto a la cámara.
-      const depthFade = MathUtils.smoothstep(child.position.z, -DEPTH, -DEPTH * 0.72);
-      // Se apagan bastante antes de llegar a la cámara: pasado ese punto la
-      // perspectiva las agranda tanto que tapan el titular.
-      const nearFade = 1 - MathUtils.smoothstep(child.position.z, -17, -9);
+      child.position.z = MathUtils.lerp(-DEPTH, NEAR_Z, t);
+
+      // Entra desde el fondo y se apaga antes de llegar a la altura del
+      // titular: pasado ese punto la perspectiva la agranda tanto que compite.
+      const enter = MathUtils.smoothstep(t, 0, 0.16);
+      const leave = 1 - MathUtils.smoothstep(t, 0.68, 0.92);
 
       const mesh = child as Mesh;
       const material = mesh.material as MeshBasicMaterial | undefined;
-      if (material) material.opacity = visibility * depthFade * nearFade;
-    }
+      if (material) material.opacity = enter * leave * globalFade;
+      child.visible = enter * leave * globalFade > 0.01;
+    });
   });
 
   return (
@@ -82,7 +93,7 @@ export function TunnelPhrases({
       {slots.map((slot) => (
         <Text
           key={slot.phrase}
-          position={[slot.x, slot.y, slot.z]}
+          position={[slot.x, slot.y, -DEPTH]}
           font="/fonts/roboto-flex.ttf"
           fontSize={0.62}
           maxWidth={7.5}
@@ -91,6 +102,7 @@ export function TunnelPhrases({
           anchorX="center"
           anchorY="middle"
           color="#ffffff"
+          visible={false}
           // El material se crea transparente para poder animar la opacidad
           // desde `useFrame` sin recrearlo en cada cambio.
           material-transparent

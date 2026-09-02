@@ -93,16 +93,17 @@ export const es: SiteContent = {
   },
 
   tunnel: {
-    statements: [
-      ["Representar", "con", "propósito"],
-      ["Representar", "con un", "toque humano"],
-      ["Primero", "los estudiantes"],
+    chapters: [
+      ["Somos Mauro", "y Juan Diego,", "y nos cansamos", "de esperar"],
+      ["a que alguien", "arreglara lo que", "todos comentamos", "en el pasillo,"],
+      ["así que dejamos", "de quejarnos", "y escribimos", "lo que sí se puede:"],
+      ["propuestas", "con fecha,", "con responsable", "y con cómo medirlas."],
     ],
     phrases: [
-      "Construyendo acuerdos que duran.",
-      "Independiente por diseño y por convicción.",
-      "Claridad primero. Ruido después.",
-      "Avanzar en pasos cortos. Apuntar lejos.",
+      "Nadie nos puso aquí.",
+      "Escuchar no es un trámite.",
+      "Sin promesas que no podamos cumplir.",
+      "Pregúntanos en marzo.",
     ],
   },
 

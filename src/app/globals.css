@@ -49,6 +49,15 @@
   --hero-shader-3: #059669;
   --hero-shader-4: #000000;
 
+  /* Fondo de cada capítulo del giro.
+     Los lee `Tunnel` con `getComputedStyle` y los interpola por scroll, que es
+     lo que permite que el tema claro los redefina sin tocar el 3D — el mismo
+     camino que ya usa `HeroShader` para su shader. */
+  --chapter-bg-1: #000000;
+  --chapter-bg-2: #04251a;
+  --chapter-bg-3: #021a12;
+  --chapter-bg-4: #000000;
+
   /* Paleta del túnel. */
   --tunnel-cyan: #22e8c4;
   --tunnel-blue: #12b46a;
@@ -101,6 +110,10 @@
   --hero-shader-2: #bbf7d0;
   --hero-shader-3: #86efac;
   --hero-shader-4: #ffffff;
+  --chapter-bg-1: #ffffff;
+  --chapter-bg-2: #e8f2ea;
+  --chapter-bg-3: #dcefe2;
+  --chapter-bg-4: #ffffff;
   color-scheme: light;
 }
 
@@ -148,6 +161,19 @@
     font-family: var(--font-sans-stack);
     overscroll-behavior: none;
     transition: background-color var(--duration-theme) ease-out;
+  }
+
+  /* El giro escribe `--bg` y `--glow` en cada frame para interpolar el fondo
+     entre capítulos. Con la transición puesta, cada escritura arranca una
+     transición nueva de 300 ms (520 ms la del degradé) y el color queda
+     persiguiendo al scroll con un retraso muy visible: se ve el fondo llegar
+     tarde a cada capítulo. `Tunnel` pone esta clase mientras la sección está
+     anclada y la quita al salir. */
+  :root.bg-scrub body,
+  :root.bg-scrub .backdrop::before,
+  :root.bg-scrub .backdrop::after,
+  :root.bg-scrub .backdrop__glow {
+    transition: none;
   }
 
   /* El shell monta su propio contenedor de scroll: el body nunca scrollea. */
@@ -226,18 +252,6 @@
 /* ==========================================================================
    ANIMACIONES CSS
    ========================================================================== */
-
-/* Entrada del titular del túnel cada vez que cambia de frase. */
-@keyframes statement-in {
-  from {
-    opacity: 0;
-    transform: translateY(0.35em);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
 
 /* Indicador de scroll del hero. El bloque global de movimiento reducido de más
    abajo lo detiene y deja el punto visible y quieto. */

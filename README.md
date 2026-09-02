@@ -67,16 +67,22 @@ src/
 
 ## Anatomía de la página
 
-| Sección    | Fondo | Qué pasa                                                      |
-| ---------- | ----- | ------------------------------------------------------------- |
-| Hero       | Azul  | Tipografía 3D inflada girando · titular de 3 líneas           |
-| Manifiesto | Negro | Imagen con distorsión líquida · dos párrafos grandes          |
-| Propuestas | Negro | Grid asimétrico de 12 columnas con etiquetas lima             |
-| Túnel      | Negro | Starfield radial scrubbeado por scroll con la sección anclada |
-| Contacto   | Azul  | Tipografía 3D · titular en cuatro segmentos                   |
+| Sección    | Fondo        | Qué pasa                                                                                                                        |
+| ---------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| Hero       | Negro        | Tipografía 3D inflada girando · los dos nombres a ancho completo                                                                |
+| Manifiesto | Negro        | Imagen con distorsión líquida · dos párrafos grandes                                                                            |
+| Giro       | Por capítulo | Cuatro capítulos anclados: una frase que se escribe palabra a palabra con el scroll, y con ella cambian paleta, energía y fondo |
+| Propuestas | Negro        | Grid asimétrico de 12 columnas con etiquetas lima                                                                               |
+| Contacto   | Verde        | Tipografía 3D · titular en cuatro segmentos                                                                                     |
 
 El fondo no es un `background` por sección: es una variable CSS que ScrollTrigger
-interpola, por eso la transición se siente continua.
+conmuta, por eso la transición se siente continua. El giro es la excepción — ahí
+la variable se escribe en cada frame, interpolada entre el color de un capítulo y
+el del siguiente, y por eso ese tramo suspende la transición del `body`.
+
+El giro va **antes** de las propuestas a propósito: es la presentación, no el
+epílogo. Su arco visual completo vive en `src/lib/three/chapters.ts`; añadir un
+capítulo es añadir una entrada ahí y su texto en `content/`.
 
 ## Accesibilidad
 

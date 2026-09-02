@@ -100,9 +100,20 @@ export interface SiteContent {
   };
 
   readonly tunnel: {
-    /** Titulares que se van reemplazando con el scroll; cada uno son sus líneas. */
-    readonly statements: readonly (readonly string[])[];
-    /** Frases sueltas que flotan en 3D dentro del túnel. */
+    /**
+     * La frase del giro, repartida en capítulos. Cada capítulo son sus líneas,
+     * y el componente parte cada línea en palabras para encenderlas una a una
+     * con el scroll.
+     *
+     * Es **una sola oración continua**, no titulares sueltos: el recorrido la
+     * va completando. Por eso las líneas terminan sin punto hasta el final.
+     *
+     * El número de capítulos tiene que coincidir con el de `CHAPTERS` en
+     * `lib/three/chapters.ts`: el capítulo *i* del copy se cuenta con la paleta
+     * *i*.
+     */
+    readonly chapters: readonly (readonly string[])[];
+    /** Una frase flotante en 3D por capítulo, en el mismo orden. */
     readonly phrases: readonly string[];
   };
 

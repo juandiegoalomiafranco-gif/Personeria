@@ -37,17 +37,19 @@ export const SPEED_MAX = 190;
 /** Largo de la estela como múltiplo de la velocidad. */
 export const STREAK_FACTOR = 0.085;
 
-/** Paleta de las estelas, en el orden en que se reparten. */
-export const STREAK_COLORS = [
-  "#22e8c4", // aguamarina
-  "#12b46a", // esmeralda
-  "#6ee36b", // verde primavera
-  "#c0fe04", // lima, el acento del sitio
-  "#ffffff", // blanco
-] as const;
-
-/** Peso relativo de cada color. El aguamarina domina, como el cian original. */
+/**
+ * Peso relativo de cada ranura de la paleta.
+ *
+ * Los colores ya no viven aquí: los pone el capítulo, en `chapters.ts`. Lo que
+ * queda es el reparto, que es estable en todo el recorrido — la ranura 0 domina
+ * el encuadre y la 3 es la rara, mande el capítulo que mande. Gracias a eso el
+ * cambio de paleta es interpolar cinco colores por frame y no reasignar los
+ * 1500 de las instancias.
+ */
 export const STREAK_WEIGHTS = [0.42, 0.18, 0.16, 0.09, 0.15] as const;
+
+/** Cuántas ranuras tiene la paleta. Es el largo de `Chapter["streaks"]`. */
+export const PALETTE_SLOTS = STREAK_WEIGHTS.length;
 
 /**
  * Reacción a la velocidad del scroll.
@@ -80,25 +82,29 @@ export const RING_SEGMENTS = 128;
 export const RING_TILT = -1.25;
 
 /**
- * Etapas de la sección, en fracción del progreso del pin.
+ * Etapas globales del pin, en fracción de su progreso.
  *
- * Cada tramo es una de las ocho fases que se ven en el video de referencia.
+ * Solo quedan las tres que valen para el recorrido entero. Lo que antes eran
+ * `ringsIn`, `ringsOut` y `phrases` lo decide ahora cada capítulo: los anillos
+ * por su campo `rings` y las frases por el capítulo al que pertenecen.
  */
 export const STAGE = {
-  /** Las estelas aparecen. */
-  fadeIn: [0, 0.06],
-  /** Los anillos aparecen rápido: si tardan, el tramo donde se ven se acaba. */
-  ringsIn: [0.01, 0.07],
-  ringsOut: [0.38, 0.52],
-  /** Las frases entran flotando. */
-  phrases: [0.16, 0.86],
-  /** Aceleración final hacia la singularidad. */
-  collapse: [0.82, 0.96],
-  /** Todo se apaga y entra el contacto. */
-  fadeOut: [0.94, 1],
+  /** Las estelas aparecen al anclarse la sección. */
+  fadeIn: [0, 0.05],
+  /** Aceleración final hacia la singularidad, ya dentro del último capítulo. */
+  collapse: [0.86, 0.97],
+  /** Todo se apaga y entran las propuestas. */
+  fadeOut: [0.95, 1],
 } as const;
 
-/** Curva de aceleración: lenta al principio, se dispara al final. */
+/**
+ * Curva de aceleración del recorrido completo: lenta al principio, se dispara
+ * al final.
+ *
+ * Encima de esto, cada capítulo aplica su propio multiplicador `speed`, así que
+ * la velocidad que se ve es el producto de las dos. La curva sigue haciendo
+ * falta para que dentro de un mismo capítulo el avance no sea plano.
+ */
 export function speedCurve(progress: number): number {
   return progress * progress * (3 - 2 * progress) * 0.55 + progress ** 4 * 0.45;
 }
