@@ -24,8 +24,8 @@ const COLOR_TOKENS = [
   ["--line", "Hairline de retícula"],
   ["--line-strong", "Cruces de retícula"],
   ["--type3d-base", "Tipografía 3D base"],
-  ["--tunnel-cyan", "Túnel cian"],
-  ["--tunnel-violet", "Túnel violeta"],
+  ["--chapter-tint-2", "Relato · tinte 2"],
+  ["--chapter-tint-3", "Relato · tinte 3"],
 ] as const;
 
 const TYPE_SCALE = [

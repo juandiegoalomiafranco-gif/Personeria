@@ -1,33 +1,29 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useContent } from "@/providers/LocaleProvider";
 import { useScroll } from "@/providers/ScrollProvider";
 import { useTheme } from "@/providers/ThemeProvider";
 import { usePrefersReducedMotion } from "@/hooks/useMediaQuery";
 import { ScrollTrigger } from "@/lib/scroll/gsap";
-import { createProgressStore } from "@/lib/scroll/progress";
-import { VELOCITY_FULL } from "@/lib/scroll/config";
 import { mixRgb, parseHex, type Rgb } from "@/lib/color";
 import {
-  blendValue,
   CHAPTERS,
   CHAPTER_COUNT,
   CHAPTER_RUNWAY_VH,
   chapterAt,
   createChapterCursor,
-} from "@/lib/three/chapters";
-import { TunnelForeground } from "@/components/animation/TunnelForeground";
+  layerWeight,
+} from "@/lib/story/chapters";
+import { ChapterBackdrop } from "@/components/animation/ChapterBackdrop";
 import { cn } from "@/lib/utils";
 
 /**
  * Cuánto scroll dura el anclaje, en múltiplos del alto del viewport.
  *
- * Ya no es un número suelto: sale de cuántos capítulos hay. Añadir un capítulo
- * a `CHAPTERS` alarga la pista sola, sin tocar esto.
+ * Sale de cuántos capítulos hay: añadir uno a `CHAPTERS` alarga la pista sola.
  */
-export const TUNNEL_RUNWAY_VH = CHAPTER_COUNT * CHAPTER_RUNWAY_VH;
+export const CHAPTERS_RUNWAY_VH = CHAPTER_COUNT * CHAPTER_RUNWAY_VH;
 
 /**
  * Ventana de entrada y de salida de cada bloque de texto, en unidades de
@@ -36,7 +32,8 @@ export const TUNNEL_RUNWAY_VH = CHAPTER_COUNT * CHAPTER_RUNWAY_VH;
  * La entrada empieza en negativo a propósito: el bloque del capítulo siguiente
  * ya se está montando mientras el anterior todavía se va. Sin ese solape hay un
  * instante con la pantalla vacía entre capítulo y capítulo, y el recorrido se
- * parte en cuatro diapositivas.
+ * parte en cuatro diapositivas. Y cierra exactamente en 0 para que el primer
+ * capítulo esté entero en el progreso 0, no a medio entrar.
  */
 const BLOCK_IN: readonly [number, number] = [-0.16, 0];
 const BLOCK_OUT: readonly [number, number] = [0.84, 1];
@@ -52,12 +49,6 @@ const REVEAL: readonly [number, number] = [0.06, 0.72];
 
 /** Opacidad de una palabra todavía sin encender. Es `--label-3` sobre el fondo. */
 const WORD_DIM = 0.3;
-
-/** El canvas pesa: solo se descarga cuando la página ya está interactiva. */
-const TunnelCanvas = dynamic(
-  () => import("@/components/three/TunnelCanvas").then((m) => m.TunnelCanvas),
-  { ssr: false },
-);
 
 /**
  * Tipografía del bloque, compartida por el recorrido y su versión estática.
@@ -78,7 +69,7 @@ function within(value: number, [start, end]: readonly [number, number]): number 
 }
 
 /**
- * El giro: el recorrido por capítulos.
+ * El relato: quiénes son, en una sola frase que se escribe con el scroll.
  *
  * Un contenedor alto de verdad con un hijo `sticky top-0`: mientras el padre
  * cruza el viewport, el hijo queda congelado y su contenido se scrubbea con el
@@ -86,23 +77,21 @@ function within(value: number, [start, end]: readonly [number, number]): number 
  *
  * Lo que se lee es **una sola frase** repartida en capítulos, y las palabras se
  * encienden una a una conforme el scroll las alcanza — no hay titulares que se
- * releven. Al mismo tiempo el capítulo manda sobre la paleta del túnel, sobre su
- * energía y sobre el fondo de la página, que se interpola en las zonas de
- * solape.
+ * releven. Detrás no hay nada que se mueva: solo cuatro capas de degradado que
+ * se cruzan por opacidad, de modo que el fondo cambie de tono a lo largo del
+ * recorrido sin que aparezca ni una partícula.
  *
- * Nada de esto pasa por estado de React. El progreso vive en un objeto mutable
- * que lee la escena 3D dentro de su bucle, y el texto y el fondo los escribe
- * este componente directamente sobre el DOM desde el `onUpdate` del trigger:
- * son cientos de escrituras por segundo, y una sola de ellas en estado
+ * Nada de esto pasa por estado de React. El texto, el fondo y las marcas los
+ * escribe este componente directamente sobre el DOM desde el `onUpdate` del
+ * trigger: son cientos de escrituras por segundo, y una sola de ellas en estado
  * re-renderizaría el árbol entero.
  */
-export function Tunnel() {
-  const { tunnel } = useContent();
+export function Chapters() {
+  const { story } = useContent();
   const { scroller } = useScroll();
   const { resolved } = useTheme();
   const prefersReducedMotion = usePrefersReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
-  const [progress] = useState(createProgressStore);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -111,10 +100,9 @@ export function Tunnel() {
     const cursor = createChapterCursor();
     const root = document.documentElement;
 
-    // Los fondos de capítulo se leen del CSS y no de una constante de JS para
-    // que el tema claro pueda redefinirlos sin tocar el 3D — el mismo camino que
-    // usa `HeroShader`. Se leen a mano y no por frame: `getComputedStyle` fuerza
-    // un recálculo de estilo.
+    // Los colores base se leen del CSS y no de una constante de JS para que el
+    // tema claro los redefina sin tocar este archivo. Se leen a mano y no por
+    // frame: `getComputedStyle` fuerza un recálculo de estilo.
     let backgrounds: Rgb[] = CHAPTERS.map(() => [0, 0, 0] as const);
     const readBackgrounds = () => {
       const styles = getComputedStyle(root);
@@ -128,15 +116,16 @@ export function Tunnel() {
     // Quien escribe `data-theme` es el efecto de `ThemeProvider`, que está por
     // encima en el árbol, y React corre los efectos de los hijos ANTES que los
     // del padre. Así que en el momento de la línea de arriba el atributo todavía
-    // lleva el tema anterior: al arrancar en oscuro se leían los cuatro fondos
-    // del tema claro y el giro se quedaba en blanco toda la sección. Un rAF cae
-    // después de todo el commit, cuando el atributo ya es el definitivo.
+    // lleva el tema anterior: al arrancar en oscuro se leían los cuatro colores
+    // del tema claro y la sección se quedaba en blanco. Un rAF cae después de
+    // todo el commit, cuando el atributo ya es el definitivo.
     const themeFrame = requestAnimationFrame(readBackgrounds);
 
     const blocks = Array.from(section.querySelectorAll<HTMLElement>("[data-chapter]"));
     const words = blocks.map((block) =>
       Array.from(block.querySelectorAll<HTMLElement>("[data-word]")),
     );
+    const layers = Array.from(section.querySelectorAll<HTMLElement>("[data-chapter-layer]"));
     const ticks = Array.from(section.querySelectorAll<HTMLElement>("[data-tick]"));
 
     /** Devuelve el fondo del sitio a lo que esperan las secciones vecinas. */
@@ -149,11 +138,18 @@ export function Tunnel() {
     const paint = (value: number) => {
       chapterAt(value, cursor);
 
-      // Fondo y luz del capítulo.
+      // El color del `body`. Va interpolado para que no haya costura entre la
+      // capa del degradado y lo que queda fuera de ella.
       const from = backgrounds[cursor.index] ?? backgrounds[0];
       const to = backgrounds[cursor.next] ?? from;
       if (from && to) root.style.setProperty("--bg", mixRgb(from, to, cursor.blend));
-      root.style.setProperty("--glow", `${blendValue(cursor, (chapter) => chapter.glow)}`);
+
+      // Las capas del degradado: lo único que se les toca es la opacidad.
+      for (let i = 0; i < layers.length; i += 1) {
+        const layer = layers[i];
+        if (!layer) continue;
+        layer.style.opacity = `${layerWeight(cursor.position, i)}`;
+      }
 
       blocks.forEach((block, index) => {
         // Cuánto lleva recorrido el capítulo de este bloque: negativo antes de
@@ -206,29 +202,20 @@ export function Tunnel() {
       start: "top top",
       end: "bottom bottom",
       onUpdate: (self) => {
-        progress.value = self.progress;
-
-        // El pulso de velocidad. Se recorta a 1 porque `getVelocity()` devuelve
-        // píxeles por segundo sin techo —un golpe de rueda pasa de 5000 sin
-        // esfuerzo— y sin recortarlo las estelas se irían a longitudes
-        // absurdas en un solo frame. Quien lo baja es el bucle de render.
-        progress.pushVelocity(Math.min(1, Math.abs(self.getVelocity()) / VELOCITY_FULL));
-
         // Solo se pinta dentro de la sección. `onUpdate` también dispara en el
         // frame en el que se sale, después de que `onToggle` haya devuelto el
         // fondo: sin esta guarda, ese último pintado volvía a escribir el color
-        // del capítulo y el sitio se quedaba con el fondo del giro al llegar al
-        // hero.
+        // del capítulo y el sitio se quedaba con él al llegar al hero.
         if (self.isActive) paint(self.progress);
       },
       onToggle: (self) => {
-        progress.setActive(self.isActive);
-
         if (self.isActive) {
           // Mientras el fondo se escribe por frame hay que apagar su transición.
           // Si no, cada escritura arranca una transición nueva de 300 ms y el
           // color queda persiguiendo al scroll con un retraso muy visible.
           root.classList.add("bg-scrub");
+          // Aquí no hay luz de puntero: el fondo tiene que leerse constante.
+          root.style.setProperty("--glow", "0");
           // El tema pudo cambiar mientras la sección estaba fuera de pantalla.
           readBackgrounds();
           paint(self.progress);
@@ -243,6 +230,7 @@ export function Tunnel() {
     // los bloques se quedarían con la opacidad del render del servidor.
     if (trigger.isActive) {
       root.classList.add("bg-scrub");
+      root.style.setProperty("--glow", "0");
       paint(trigger.progress);
     }
 
@@ -251,12 +239,12 @@ export function Tunnel() {
       trigger.kill();
       releaseBackground();
     };
-  }, [scroller, prefersReducedMotion, progress, resolved]);
+  }, [scroller, prefersReducedMotion, resolved]);
 
-  const chapters = tunnel.chapters;
+  const chapters = story.chapters;
 
   // Con movimiento reducido no hay recorrido: la frase se lee entera, de una
-  // vez, apilada y quieta. Antes esto dejaba quinientos vh de negro con un solo
+  // vez, apilada y quieta. Antes esto dejaba quinientos vh de vacío con un solo
   // titular, que es peor que no tener la sección.
   if (prefersReducedMotion) {
     return (
@@ -272,11 +260,6 @@ export function Tunnel() {
             </p>
           ))}
         </div>
-        <ul className="sr-only">
-          {tunnel.phrases.map((phrase) => (
-            <li key={phrase}>{phrase}</li>
-          ))}
-        </ul>
       </section>
     );
   }
@@ -284,42 +267,16 @@ export function Tunnel() {
   return (
     <section
       ref={sectionRef}
+      // Un tono que `ScrollChoreography` no conoce y por tanto ignora: el fondo
+      // de esta sección lo escribe ella misma, interpolado capítulo a capítulo.
       data-section-bg="chapters"
       className="relative z-10 w-full"
-      style={{ height: `${TUNNEL_RUNWAY_VH}vh` }}
+      style={{ height: `${CHAPTERS_RUNWAY_VH}vh` }}
     >
-      <TunnelCanvas phrases={tunnel.phrases} progress={progress} />
+      <div className="sticky top-0 h-dvh w-full overflow-hidden">
+        <ChapterBackdrop />
 
-      {/* El `z-40` va aquí, no en el `p`.
-
-          `position: sticky` crea un contexto de apilamiento propio, así que
-          cualquier z-index de un hijo solo compite DENTRO de este div. El
-          canvas del túnel es hermano suyo con `z-30`, y sin este z-40 se
-          pintaba por encima del bloque entero: las estelas cruzaban por encima
-          de las letras y lo dejaban ilegible. */}
-      <div className="sticky top-0 z-40 h-dvh w-full">
         <div className="relative h-full w-full">
-          {/* Velo de legibilidad.
-
-              A la densidad de los últimos capítulos el radial llega al centro
-              del encuadre, y ahí es donde están las palabras: las que todavía no
-              se han encendido —que van al 30%— quedaban directamente ilegibles
-              sobre las estelas. Este degradado hunde el centro sin tocar los
-              bordes, así que el efecto se sigue viendo entero por fuera del
-              bloque de texto.
-
-              Se tiñe con `--bg`, no con negro: como el fondo lo escribe el
-              propio capítulo en cada frame, el velo cambia de color con él en
-              vez de dejar una mancha oscura sobre el verde. */}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(ellipse 62% 42% at 50% 50%, color-mix(in oklab, var(--bg) 88%, transparent), transparent 74%)",
-            }}
-          />
-
           {chapters.map((lines, index) => (
             <p
               key={index}
@@ -374,12 +331,6 @@ export function Tunnel() {
           </div>
         </div>
       </div>
-
-      {/* Por encima del titular a propósito: es lo que hace que algo pase por
-          delante de las palabras en vez de siempre por detrás. Va de hermano del
-          sticky, no dentro, porque un z-index dentro de un sticky solo compite
-          contra sus propios hermanos. */}
-      <TunnelForeground progress={progress} />
     </section>
   );
 }

@@ -88,18 +88,12 @@ export const en: SiteContent = {
     ],
   },
 
-  tunnel: {
+  story: {
     chapters: [
       ["We're Mauro", "and Juan Diego,", "and we got tired", "of waiting"],
       ["for someone else", "to fix what we all", "complain about", "in the hallway,"],
       ["so we stopped", "complaining", "and wrote down", "what can be done:"],
       ["proposals,", "with a date,", "a name on them,", "and a way to check."],
-    ],
-    phrases: [
-      "Nobody appointed us.",
-      "Listening is not a formality.",
-      "No promises we cannot keep.",
-      "Ask us again in March.",
     ],
   },
 

@@ -67,22 +67,29 @@ src/
 
 ## Anatomía de la página
 
-| Sección    | Fondo        | Qué pasa                                                                                                                        |
-| ---------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| Hero       | Negro        | Tipografía 3D inflada girando · los dos nombres a ancho completo                                                                |
-| Manifiesto | Negro        | Imagen con distorsión líquida · dos párrafos grandes                                                                            |
-| Giro       | Por capítulo | Cuatro capítulos anclados: una frase que se escribe palabra a palabra con el scroll, y con ella cambian paleta, energía y fondo |
-| Propuestas | Negro        | Grid asimétrico de 12 columnas con etiquetas lima                                                                               |
-| Contacto   | Verde        | Tipografía 3D · titular en cuatro segmentos                                                                                     |
+| Sección    | Fondo        | Qué pasa                                                                                                                                 |
+| ---------- | ------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Hero       | Negro        | Shader de ruido verde · los dos nombres a ancho completo                                                                                 |
+| Relato     | Por capítulo | Cuatro capítulos anclados: una frase que se escribe palabra a palabra con el scroll, sobre un degradado quieto que cambia de tono con él |
+| Manifiesto | Negro        | Imagen con distorsión líquida · dos párrafos grandes                                                                                     |
+| Propuestas | Negro        | Grid asimétrico de 12 columnas con etiquetas lima                                                                                        |
+| Contacto   | Verde        | Tipografía 3D · titular en cuatro segmentos                                                                                              |
 
 El fondo no es un `background` por sección: es una variable CSS que ScrollTrigger
-conmuta, por eso la transición se siente continua. El giro es la excepción — ahí
-la variable se escribe en cada frame, interpolada entre el color de un capítulo y
-el del siguiente, y por eso ese tramo suspende la transición del `body`.
+conmuta, por eso la transición se siente continua. El relato es la excepción —
+ahí la variable se escribe en cada frame, interpolada entre el color de un
+capítulo y el del siguiente, y por eso ese tramo suspende la transición del
+`body`.
 
-El giro va **antes** de las propuestas a propósito: es la presentación, no el
-epílogo. Su arco visual completo vive en `src/lib/three/chapters.ts`; añadir un
-capítulo es añadir una entrada ahí y su texto en `content/`.
+Detrás del relato no hay nada que se mueva: son cuatro capas de degradado ya
+rasterizadas que se cruzan por opacidad. Reescribir las paradas de un solo
+degradado en cada frame obligaría a repintar la pantalla completa; la opacidad la
+resuelve el compositor.
+
+El relato va justo después del hero a propósito: es la presentación, no el
+epílogo. Su arco de color vive en `src/lib/story/chapters.ts` y en los tokens
+`--chapter-*` de `globals.css`; añadir un capítulo es añadir una entrada ahí y su
+texto en `content/`.
 
 ## Accesibilidad
 

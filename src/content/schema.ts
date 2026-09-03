@@ -99,22 +99,20 @@ export interface SiteContent {
     readonly items: readonly WorkItem[];
   };
 
-  readonly tunnel: {
+  readonly story: {
     /**
-     * La frase del giro, repartida en capítulos. Cada capítulo son sus líneas,
-     * y el componente parte cada línea en palabras para encenderlas una a una
-     * con el scroll.
+     * La frase que cuenta quiénes son, repartida en capítulos. Cada capítulo
+     * son sus líneas, y el componente parte cada línea en palabras para
+     * encenderlas una a una con el scroll.
      *
      * Es **una sola oración continua**, no titulares sueltos: el recorrido la
      * va completando. Por eso las líneas terminan sin punto hasta el final.
      *
      * El número de capítulos tiene que coincidir con el de `CHAPTERS` en
-     * `lib/three/chapters.ts`: el capítulo *i* del copy se cuenta con la paleta
+     * `lib/story/chapters.ts`: el capítulo *i* del copy se pinta con el tono
      * *i*.
      */
     readonly chapters: readonly (readonly string[])[];
-    /** Una frase flotante en 3D por capítulo, en el mismo orden. */
-    readonly phrases: readonly string[];
   };
 
   readonly contact: {

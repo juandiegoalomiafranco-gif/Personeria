@@ -92,18 +92,12 @@ export const es: SiteContent = {
     ],
   },
 
-  tunnel: {
+  story: {
     chapters: [
       ["Somos Mauro", "y Juan Diego,", "y nos cansamos", "de esperar"],
       ["a que alguien", "arreglara lo que", "todos comentamos", "en el pasillo,"],
       ["así que dejamos", "de quejarnos", "y escribimos", "lo que sí se puede:"],
       ["propuestas", "con fecha,", "con responsable", "y con cómo medirlas."],
-    ],
-    phrases: [
-      "Nadie nos puso aquí.",
-      "Escuchar no es un trámite.",
-      "Sin promesas que no podamos cumplir.",
-      "Pregúntanos en marzo.",
     ],
   },
 

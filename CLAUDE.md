@@ -30,8 +30,8 @@ de secciones y el stack.
   propio overflow y Lenis encima. Todo `ScrollTrigger` debe apuntar a ese
   contenedor con `scroller`, no a `window`. Es el error número uno.
 - **Hay dos canvas.** El de fondo (`-z-1`) sostiene la tipografía 3D. El de
-  frente (`z-30`) sostiene stickers, túnel y la flecha final, y va por encima
-  del header a propósito.
+  frente (`z-30`) sostiene stickers y la flecha final, y va por encima del
+  header a propósito.
 - **El fondo de sección es una variable CSS** (`--bg`), interpolada por scroll.
   No pongas `background` en las secciones.
 - **Los canvas ambientales no dibujan a 60.** El de fondo y el de stickers van
@@ -39,13 +39,17 @@ de secciones y el stack.
   dentro del mismo `requestAnimationFrame` que dibuja el WebGL, así que cada
   frame caro de 3D es una actualización de scroll que no ocurre. No los pongas
   en `"always"`. Y nunca uses el `advance()` de r3f para esto: sin argumento de
-  estado redibuja **todos** los roots ignorando su `frameloop`, y despierta el
-  túnel durante toda la página. El túnel sí se queda en `"always"`, porque su
-  movimiento está scrubbeado al scroll y a 30 se vería a saltos.
-- **`position: sticky` crea contexto de apilamiento.** El titular del túnel
-  tenía `z-40` y aun así las estelas le pasaban por encima: ese z-index solo
-  competía _dentro_ del div sticky, y el canvas es hermano suyo. El z-index va
-  en el elemento sticky, no en su hijo.
+  estado redibuja **todos** los roots ignorando su `frameloop`, despertando cada
+  canvas de la página aunque no esté en pantalla.
+- **`position: sticky` crea contexto de apilamiento.** Un z-index puesto en un
+  hijo del sticky solo compite _dentro_ de ese div, no contra sus hermanos. Ya
+  costó un bug: el titular llevaba `z-40` y el canvas hermano se le pintaba
+  encima igual. El z-index va en el elemento sticky, no en su hijo.
+- **El relato no tiene nada que se mueva detrás.** Su fondo son cuatro capas de
+  degradado ya rasterizadas que se cruzan por opacidad, y el color base va por
+  `--bg`. Si alguna vez hace falta que ese fondo cambie de forma, hazlo con otra
+  capa y opacidad: reescribir las paradas de un degradado en cada frame repinta
+  la pantalla entera (ver el punto de abajo).
 - **El fondo degradado se mueve con `transform`, no cambiando el centro del
   gradiente.** Recolocar el centro de un `radial-gradient` obliga a
   rerasterizar a pantalla completa en cada frame; medido, eso subía el arranque
