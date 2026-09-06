@@ -49,12 +49,26 @@
   --hero-shader-3: #059669;
   --hero-shader-4: #000000;
 
-  /* Paleta del túnel. */
-  --tunnel-cyan: #22e8c4;
-  --tunnel-blue: #12b46a;
-  --tunnel-violet: #6ee36b;
-  --tunnel-magenta: #c0fe04;
-  --tunnel-white: #ffffff;
+  /* Fondo de cada capítulo del relato: un color base y el tinte que florece
+     desde arriba. `Chapters` lee las bases con `getComputedStyle` para escribir
+     `--bg`, y las capas del degradado los consumen directo desde CSS — el mismo
+     camino que ya usa `HeroShader` para su shader, y lo que permite que el tema
+     claro los redefina sin tocar el JS.
+
+     El arco arranca en el negro verdoso del hero para que el paso desde los
+     nombres no se note, florece en el medio y vuelve al negro en el último,
+     que es lo que espera el manifiesto justo debajo. */
+  --chapter-bg-1: #000000;
+  --chapter-tint-1: #0b3b2a;
+  --chapter-bg-2: #04251a;
+  --chapter-tint-2: #0e8a58;
+  /* Aguamarina y no verde: con dos esmeraldas seguidas el recorrido se veía
+     plano, y lo que se pidió es que el fondo cambie a medida que se avanza.
+     Un salto de tono, no de luminosidad, es lo que se percibe. */
+  --chapter-bg-3: #032a26;
+  --chapter-tint-3: #0fa5a0;
+  --chapter-bg-4: #000000;
+  --chapter-tint-4: #0a2f22;
 
   /* Familias tipográficas. Las variables --font-* las inyecta next/font. */
   --font-sans-stack: var(--font-roboto-flex), "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -101,6 +115,14 @@
   --hero-shader-2: #bbf7d0;
   --hero-shader-3: #86efac;
   --hero-shader-4: #ffffff;
+  --chapter-bg-1: #ffffff;
+  --chapter-tint-1: #e4f5eb;
+  --chapter-bg-2: #e8f2ea;
+  --chapter-tint-2: #b7e6cd;
+  --chapter-bg-3: #e2f2f0;
+  --chapter-tint-3: #97ddd8;
+  --chapter-bg-4: #ffffff;
+  --chapter-tint-4: #e4f5eb;
   color-scheme: light;
 }
 
@@ -148,6 +170,19 @@
     font-family: var(--font-sans-stack);
     overscroll-behavior: none;
     transition: background-color var(--duration-theme) ease-out;
+  }
+
+  /* El relato escribe `--bg` en cada frame para interpolar el fondo entre
+     capítulos. Con la transición puesta, cada escritura arranca una transición
+     nueva de 300 ms (520 ms la del degradé) y el color queda persiguiendo al
+     scroll con un retraso muy visible: se ve el fondo llegar tarde a cada
+     capítulo. `Chapters` pone esta clase mientras la sección está anclada y la
+     quita al salir. */
+  :root.bg-scrub body,
+  :root.bg-scrub .backdrop::before,
+  :root.bg-scrub .backdrop::after,
+  :root.bg-scrub .backdrop__glow {
+    transition: none;
   }
 
   /* El shell monta su propio contenedor de scroll: el body nunca scrollea. */
@@ -226,18 +261,6 @@
 /* ==========================================================================
    ANIMACIONES CSS
    ========================================================================== */
-
-/* Entrada del titular del túnel cada vez que cambia de frase. */
-@keyframes statement-in {
-  from {
-    opacity: 0;
-    transform: translateY(0.35em);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
 
 /* Indicador de scroll del hero. El bloque global de movimiento reducido de más
    abajo lo detiene y deja el punto visible y quieto. */

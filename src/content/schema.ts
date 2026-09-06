@@ -99,11 +99,20 @@ export interface SiteContent {
     readonly items: readonly WorkItem[];
   };
 
-  readonly tunnel: {
-    /** Titulares que se van reemplazando con el scroll; cada uno son sus líneas. */
-    readonly statements: readonly (readonly string[])[];
-    /** Frases sueltas que flotan en 3D dentro del túnel. */
-    readonly phrases: readonly string[];
+  readonly story: {
+    /**
+     * La frase que cuenta quiénes son, repartida en capítulos. Cada capítulo
+     * son sus líneas, y el componente parte cada línea en palabras para
+     * encenderlas una a una con el scroll.
+     *
+     * Es **una sola oración continua**, no titulares sueltos: el recorrido la
+     * va completando. Por eso las líneas terminan sin punto hasta el final.
+     *
+     * El número de capítulos tiene que coincidir con el de `CHAPTERS` en
+     * `lib/story/chapters.ts`: el capítulo *i* del copy se pinta con el tono
+     * *i*.
+     */
+    readonly chapters: readonly (readonly string[])[];
   };
 
   readonly contact: {
