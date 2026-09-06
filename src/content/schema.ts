@@ -39,12 +39,6 @@ export interface WorkItem {
   readonly preview?: { readonly src: string; readonly alt: string };
 }
 
-export interface SocialLink {
-  readonly id: string;
-  readonly label: string;
-  readonly href: string;
-}
-
 export interface SiteContent {
   readonly meta: {
     readonly title: string;
@@ -66,9 +60,6 @@ export interface SiteContent {
   readonly nav: {
     readonly work: string;
     readonly contact: string;
-    /** Etiqueta del switch de tema; la letra del atajo se añade aparte. */
-    readonly theme: string;
-    readonly sound: string;
     /** Etiqueta del botón que abre el menú en pantallas pequeñas. */
     readonly menu: string;
     readonly closeMenu: string;
@@ -120,15 +111,10 @@ export interface SiteContent {
     readonly headline: readonly string[];
     readonly type3d: string;
     readonly email: string;
-    readonly socials: readonly SocialLink[];
     readonly copyright: string;
   };
 
   readonly chrome: {
-    /** Etiqueta de zona horaria de la barra inferior, p. ej. "GMT-5 CO". */
-    readonly timezoneLabel: string;
-    /** Coordenadas para el clima; la barra muestra la temperatura real. */
-    readonly weather: { readonly latitude: number; readonly longitude: number };
     readonly localeToggleLabel: string;
     /** Enlace de salto al contenido, visible solo con foco de teclado. */
     readonly skipToContent: string;

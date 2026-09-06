@@ -15,10 +15,8 @@ export const en: SiteContent = {
   nav: {
     work: "Platform",
     contact: "Contact",
-    theme: "Theme",
     menu: "Menu",
     closeMenu: "Close",
-    sound: "Sound",
   },
 
   hero: {
@@ -101,17 +99,10 @@ export const en: SiteContent = {
     headline: ["Let's", "Build", "something", "extraordinary"],
     type3d: "Your Voice",
     email: "hola@personeria2026.co",
-    socials: [
-      { id: "instagram", label: "Instagram", href: "#" },
-      { id: "tiktok", label: "TikTok", href: "#" },
-      { id: "whatsapp", label: "WhatsApp", href: "#" },
-    ],
     copyright: "PERSONERÍA (C) 2026",
   },
 
   chrome: {
-    timezoneLabel: "GMT-5 CO",
-    weather: { latitude: 4.711, longitude: -74.0721 },
     skipToContent: "Skip to content",
     localeToggleLabel: "Switch language",
   },

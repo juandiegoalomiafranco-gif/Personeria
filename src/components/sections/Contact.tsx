@@ -21,6 +21,21 @@ const HEADLINE_POSITIONS = [
 /** Filas del titular: índices de `headline` que van juntos. */
 const HEADLINE_ROWS = [[0, 1], [2], [3]] as const;
 
+/**
+ * Color de acento por segmento, indexado igual que `HEADLINE_POSITIONS`.
+ *
+ * Reemplaza a la palabra 3D que giraba detrás del titular: en vez de
+ * profundidad con geometría, cada segmento revela en un tono distinto,
+ * mezclando `--accent` sobre `--label-1` para que ningún tono quede oscuro
+ * sobre `--bg-deep` en ninguno de los dos temas.
+ */
+const HEADLINE_ACCENTS = [
+  "color-mix(in oklab, var(--accent) 45%, var(--label-1))",
+  "color-mix(in oklab, var(--accent) 75%, var(--label-1))",
+  "var(--accent)",
+  "color-mix(in oklab, var(--accent) 60%, var(--label-1))",
+] as const;
+
 export function Contact() {
   const { contact } = useContent();
 
@@ -28,8 +43,6 @@ export function Contact() {
     <footer
       id="contacto"
       data-section-bg="deep"
-      data-type3d="contact"
-      data-stickers
       className="pointer-events-none relative z-10 flex h-dvh w-full flex-col justify-center p-6 lg:h-screen lg:p-16"
     >
       {HEADLINE_ROWS.map((row, rowIndex) => (
@@ -40,7 +53,7 @@ export function Contact() {
         >
           {row.map((index) => (
             <span key={index} className={cn("pointer-events-auto", HEADLINE_POSITIONS[index])}>
-              <span data-reveal-line className="block">
+              <span data-reveal-line className="block" style={{ color: HEADLINE_ACCENTS[index] }}>
                 {contact.headline[index]}
               </span>
             </span>
@@ -48,27 +61,14 @@ export function Contact() {
         </div>
       ))}
 
-      {/* Datos de contacto anclados al pie, por encima del titular. */}
+      {/* Dato de contacto anclado al pie, por encima del titular. */}
       <div className="font-mono-2 absolute inset-0 flex flex-col justify-end px-4 py-18 text-sm lg:px-14 lg:py-24 lg:text-base">
-        <div className="flex w-full flex-col justify-between lg:flex-row">
-          <a href={`mailto:${contact.email}`} className={cn(DOTTED, "pointer-events-auto block")}>
-            {contact.email}
-          </a>
-
-          <div className="flex flex-row items-center gap-2 lg:gap-4">
-            {contact.socials.map((social) => (
-              <a
-                key={social.id}
-                href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={cn(DOTTED, "pointer-events-auto block")}
-              >
-                {social.label}
-              </a>
-            ))}
-          </div>
-        </div>
+        <a
+          href={`mailto:${contact.email}`}
+          className={cn(DOTTED, "pointer-events-auto block self-start")}
+        >
+          {contact.email}
+        </a>
       </div>
     </footer>
   );

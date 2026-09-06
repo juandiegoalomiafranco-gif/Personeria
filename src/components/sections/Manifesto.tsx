@@ -34,10 +34,16 @@ export function Manifesto() {
       </div>
 
       <div className="col-span-12 flex flex-col items-start justify-start gap-6 text-base leading-none sm:col-span-7 sm:col-start-6 lg:col-span-8 lg:col-start-5 lg:text-xl">
-        <p className="text-l1 w-full p-2 text-xl leading-[1.3] md:text-[4.2svw] md:leading-none">
+        <p
+          data-reveal-fade
+          className="text-l1 w-full p-2 text-xl leading-[1.3] md:text-[4.2svw] md:leading-none"
+        >
           <RichText value={manifesto.primary} />
         </p>
-        <p className="text-l2 w-full p-2 text-xl leading-[1.3] md:text-[4.2svw] md:leading-none">
+        <p
+          data-reveal-fade
+          className="text-l2 w-full p-2 text-xl leading-[1.3] md:text-[4.2svw] md:leading-none"
+        >
           <RichText value={manifesto.secondary} />
         </p>
       </div>

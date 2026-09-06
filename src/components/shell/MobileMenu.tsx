@@ -3,8 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useContent } from "@/providers/LocaleProvider";
 import { useScroll } from "@/providers/ScrollProvider";
-import { SoundToggle } from "@/components/ui/SoundToggle";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { LocaleToggle } from "@/components/ui/LocaleToggle";
 import { DOTTED } from "@/components/ui/dotted";
 import { cn } from "@/lib/utils";
@@ -134,9 +132,7 @@ export function MobileMenu() {
           </a>
         </nav>
 
-        <div className="font-mono-2 flex items-center justify-between gap-2 text-sm">
-          <ThemeToggle />
-          <SoundToggle />
+        <div className="font-mono-2 flex items-center justify-start gap-2 text-sm">
           <LocaleToggle />
         </div>
       </div>

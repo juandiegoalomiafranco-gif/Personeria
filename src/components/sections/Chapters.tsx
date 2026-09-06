@@ -225,13 +225,17 @@ export function Chapters() {
       },
     });
 
-    // El primer pintado no puede esperar al primer `onUpdate`: si la página
-    // carga con el scroll ya dentro de la sección —una recarga a media página—
-    // los bloques se quedarían con la opacidad del render del servidor.
+    // El primer pintado no puede esperar al primer `onUpdate`: si no se pinta
+    // ya, los 4 bloques se quedan en su estado por defecto —visibles, todos a
+    // la vez— hasta el próximo scroll. Eso pasa siempre que la página carga
+    // con el trigger todavía inactivo (el caso normal: arrancar en el hero),
+    // no solo en la recarga a media página. Por eso va incondicional: el fondo
+    // en modo scrub sí depende de si el trigger está activo, pero que los
+    // bloques tengan un estado seguro no debe depender de nada.
+    paint(trigger.progress);
     if (trigger.isActive) {
       root.classList.add("bg-scrub");
       root.style.setProperty("--glow", "0");
-      paint(trigger.progress);
     }
 
     return () => {
@@ -240,6 +244,15 @@ export function Chapters() {
       releaseBackground();
     };
   }, [scroller, prefersReducedMotion, resolved]);
+
+  // El layout cambia de alto cuando cargan las fuentes: sin este refresh el
+  // trigger mide contra el layout provisional y `progress`/`isActive` quedan
+  // desincronizados del scroll real hasta el próximo resize. Mismo patrón que
+  // `ScrollChoreography`.
+  useEffect(() => {
+    if (!scroller || prefersReducedMotion) return;
+    void document.fonts.ready.then(() => ScrollTrigger.refresh());
+  }, [scroller, prefersReducedMotion]);
 
   const chapters = story.chapters;
 
