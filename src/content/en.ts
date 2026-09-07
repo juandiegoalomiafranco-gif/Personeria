@@ -44,28 +44,74 @@ export const en: SiteContent = {
     title: "What shaped us",
     items: [
       {
+        id: "casas",
+        label: "The houses",
+        reflection:
+          "The four houses —Canning, Ferguson, O'Leary and Rooke— compete all year long, and that's where you learn that you win by what the group does, not by what one person does. Mauro captains Rooke.",
+        image: {
+          src: "/images/actividades/casas.jpg",
+          alt: "Students beside the Rooke house banner",
+        },
+      },
+      {
         id: "rugby",
         label: "Rugby",
         reflection:
           "Rugby taught us to get back up after every hit and look out for the person next to you — nobody moves forward alone there.",
+        image: {
+          src: "/images/actividades/rugby.jpg",
+          alt: "The school rugby team with the ball, in front of the CCB Sports wall",
+        },
       },
       {
         id: "futbol",
         label: "Soccer",
         reflection:
           "Soccer taught us to read a play together and change the plan mid-match without losing trust in the team.",
+        image: {
+          src: "/images/actividades/futbol.jpg",
+          alt: "Soccer team with medals and a trophy on the field",
+        },
       },
       {
         id: "musical",
         label: "The musical",
         reflection:
           "The musical taught us that a good result isn't improvised: you rehearse, you correct, and you hold it together even when your nerves say otherwise.",
+        image: {
+          src: "/images/actividades/musical.jpg",
+          alt: "A scene from the school musical on stage",
+        },
+      },
+      {
+        id: "musica",
+        label: "Music",
+        reflection:
+          "Playing live taught us to listen before coming in: a band doesn't sound good because of what each person plays, but because of how they hear each other.",
+        image: {
+          src: "/images/actividades/musica.jpg",
+          alt: "The band playing live: drums and guitar on stage",
+        },
       },
       {
         id: "onu",
         label: "Model UN",
         reflection:
           "Model UN taught us to defend a position without ever stopping listening to the other side — and that real negotiation is the only way to actually move something forward.",
+        image: {
+          src: "/images/actividades/onu.jpg",
+          alt: "School delegates at Model UN",
+        },
+      },
+      {
+        id: "servicio",
+        label: "Community service",
+        reflection:
+          "Volunteering taught us that helping isn't showing up once with a box: it's coming back, remembering names, and holding up what you promised.",
+        image: {
+          src: "/images/actividades/servicio.jpg",
+          alt: "Volunteering with children at a Soñar Despierto day",
+        },
       },
     ],
     closing: [

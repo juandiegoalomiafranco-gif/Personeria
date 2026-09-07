@@ -34,10 +34,12 @@ export function Activities() {
       <div className="grid w-full grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
         {activities.items.map((item) => (
           <article key={item.id} data-reveal-card className="space-y-3">
-            {/* Sin foto real todavía, la caja muestra el label. Mismo lenguaje
-                visual que el slot de imagen de Propuestas. */}
+            {/* Mientras no haya foto real, la caja muestra el label — mismo
+                lenguaje visual que el slot de imagen de Propuestas. El
+                `aria-hidden` va solo en ese caso: con foto real el `alt` sí
+                aporta, y ahí el label de abajo no lo repite. */}
             <div
-              aria-hidden="true"
+              {...(item.image ? {} : { "aria-hidden": true })}
               className="bg-line border-line-strong text-l3 font-mono-2 relative flex aspect-square w-full items-center justify-center overflow-hidden border text-xs uppercase select-none"
             >
               {item.image ? (
@@ -45,7 +47,7 @@ export function Activities() {
                   src={item.image.src}
                   alt={item.image.alt}
                   fill
-                  sizes="(max-width: 1024px) 50vw, 25vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   className="object-cover"
                 />
               ) : (

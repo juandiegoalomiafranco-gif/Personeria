@@ -48,28 +48,74 @@ export const es: SiteContent = {
     title: "Lo que nos formó",
     items: [
       {
+        id: "casas",
+        label: "Las casas",
+        reflection:
+          "Las cuatro casas —Canning, Ferguson, O'Leary y Rooke— compiten todo el año, y ahí se aprende que se gana por lo que hace el grupo, no por lo que hace uno. Mauro es capitán de Rooke.",
+        image: {
+          src: "/images/actividades/casas.jpg",
+          alt: "Estudiantes junto al estandarte de la casa Rooke",
+        },
+      },
+      {
         id: "rugby",
         label: "Rugby",
         reflection:
           "El rugby nos enseñó a levantarnos después de cada caída y a cuidar al que tenemos al lado — ahí no se avanza solo.",
+        image: {
+          src: "/images/actividades/rugby.jpg",
+          alt: "Equipo de rugby del colegio con el balón, frente al muro de CCB Sports",
+        },
       },
       {
         id: "futbol",
         label: "Fútbol",
         reflection:
           "El fútbol nos enseñó a leer una jugada entre varios y a cambiar el plan a mitad de partido sin dejar de confiar en el equipo.",
+        image: {
+          src: "/images/actividades/futbol.jpg",
+          alt: "Equipo de fútbol con medallas y trofeo en la cancha",
+        },
       },
       {
         id: "musical",
         label: "El musical",
         reflection:
           "El musical nos enseñó que un buen resultado no se improvisa: se ensaya, se corrige y se sostiene aunque los nervios digan lo contrario.",
+        image: {
+          src: "/images/actividades/musical.jpg",
+          alt: "Escena del musical del colegio en tarima",
+        },
+      },
+      {
+        id: "musica",
+        label: "La música",
+        reflection:
+          "Tocar en vivo nos enseñó a escuchar antes de entrar: una banda no suena por lo que toca cada uno, sino por cómo se oyen entre todos.",
+        image: {
+          src: "/images/actividades/musica.jpg",
+          alt: "La banda tocando en vivo: batería y guitarra en tarima",
+        },
       },
       {
         id: "onu",
         label: "Modelo ONU",
         reflection:
           "El Modelo ONU nos enseñó a defender una postura sin dejar de escuchar la del otro — y que negociar bien es la única forma real de mover algo.",
+        image: {
+          src: "/images/actividades/onu.jpg",
+          alt: "Delegados del colegio en el Modelo ONU",
+        },
+      },
+      {
+        id: "servicio",
+        label: "Servicio social",
+        reflection:
+          "El voluntariado nos enseñó que ayudar no es aparecer un día con una caja: es volver, acordarse de los nombres y sostener lo que uno prometió.",
+        image: {
+          src: "/images/actividades/servicio.jpg",
+          alt: "Voluntariado con niños en una jornada de Soñar Despierto",
+        },
       },
     ],
     closing: [
