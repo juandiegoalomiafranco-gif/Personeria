@@ -9,9 +9,11 @@
 
 :root {
   /* Fondos de sección. El shell interpola entre estos con el scroll. */
-  --bg-deep: #04123f; /* hero y contacto */
-  --bg-void: #000000; /* manifiesto, propuestas y túnel */
-  --bg: var(--bg-deep);
+  --bg-deep: #04251a; /* contacto */
+  --bg-void: #000000; /* hero, manifiesto, propuestas y túnel */
+  /* Arranca en negro porque el hero es negro. Con `deep` de inicial había un
+     destello verde en el primer pintado, antes de que el scroll conmutara. */
+  --bg: var(--bg-void);
 
   /* Jerarquía de texto. */
   --label-1: #ffffff;
@@ -22,20 +24,51 @@
   --accent: #c0fe04;
   --on-accent: #000000;
 
+  /* Fondo con degradé. `--glow` lo conmuta el scroll: 1 en las secciones
+     profundas, 0 en las negras, para que los tramos negros sigan negros.
+     `--px`/`--py` los escribe `Backdrop` desde un rAF siguiendo al puntero. */
+  --glow: 0;
+  --glow-warm: #0e9e57;
+  --glow-cool: #0a6f7a;
+  --px: 50%;
+  --py: 38%;
+
   /* Retícula técnica y bordes punteados del hover. */
   --line: rgb(255 255 255 / 0.09);
   --line-strong: rgb(255 255 255 / 0.22);
 
   /* Tipografía 3D del fondo. */
-  --type3d-base: #2e34b7;
-  --type3d-light: #4a50e0;
+  --type3d-base: #0e9e57;
+  --type3d-light: #22c979;
 
-  /* Paleta del túnel. */
-  --tunnel-cyan: #22e0e8;
-  --tunnel-blue: #2b6cf5;
-  --tunnel-violet: #7b3ff2;
-  --tunnel-magenta: #d43ff2;
-  --tunnel-white: #ffffff;
+  /* Shader de ruido del hero. Los lee `HeroShader` con `getComputedStyle`, que
+     es lo que permite que el tema claro los redefina sin tocar el GLSL. */
+  --hero-shader-bg: #000000;
+  --hero-shader-1: #86efac;
+  --hero-shader-2: #4ade80;
+  --hero-shader-3: #059669;
+  --hero-shader-4: #000000;
+
+  /* Fondo de cada capítulo del relato: un color base y el tinte que florece
+     desde arriba. `Chapters` lee las bases con `getComputedStyle` para escribir
+     `--bg`, y las capas del degradado los consumen directo desde CSS — el mismo
+     camino que ya usa `HeroShader` para su shader, y lo que permite que el tema
+     claro los redefina sin tocar el JS.
+
+     El arco arranca en el negro verdoso del hero para que el paso desde los
+     nombres no se note, florece en el medio y vuelve al negro en el último,
+     que es lo que espera el manifiesto justo debajo. */
+  --chapter-bg-1: #000000;
+  --chapter-tint-1: #0b3b2a;
+  --chapter-bg-2: #04251a;
+  --chapter-tint-2: #0e8a58;
+  /* Aguamarina y no verde: con dos esmeraldas seguidas el recorrido se veía
+     plano, y lo que se pidió es que el fondo cambie a medida que se avanza.
+     Un salto de tono, no de luminosidad, es lo que se percibe. */
+  --chapter-bg-3: #032a26;
+  --chapter-tint-3: #0fa5a0;
+  --chapter-bg-4: #000000;
+  --chapter-tint-4: #0a2f22;
 
   /* Familias tipográficas. Las variables --font-* las inyecta next/font. */
   --font-sans-stack: var(--font-roboto-flex), "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -54,23 +87,42 @@
   --ease-signature: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
 
+  --ease-cubic-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
   --duration-hover: 200ms;
   --duration-theme: 300ms;
+  /* Espejo de `DURATION.scrollHint`. */
+  --duration-scroll-hint: 2400ms;
 
   color-scheme: dark;
 }
 
 /* Tema claro. Solo se redefinen los tokens; ninguna regla de componente cambia. */
 :root[data-theme="light"] {
-  --bg-deep: #e9eaf2;
+  --bg-deep: #e8f2ea;
   --bg-void: #ffffff;
-  --label-1: #050a1f;
-  --label-2: rgb(5 10 31 / 0.62);
-  --label-3: rgb(5 10 31 / 0.3);
-  --line: rgb(5 10 31 / 0.1);
-  --line-strong: rgb(5 10 31 / 0.24);
+  --label-1: #04160d;
+  --label-2: rgb(4 22 13 / 0.62);
+  --label-3: rgb(4 22 13 / 0.3);
+  --line: rgb(4 22 13 / 0.1);
+  --line-strong: rgb(4 22 13 / 0.24);
+  --glow-warm: #7bd6a4;
+  --glow-cool: #a8dfd6;
   --accent: #4d6b00;
   --on-accent: #ffffff;
+  --hero-shader-bg: #ffffff;
+  --hero-shader-1: #dcfce7;
+  --hero-shader-2: #bbf7d0;
+  --hero-shader-3: #86efac;
+  --hero-shader-4: #ffffff;
+  --chapter-bg-1: #ffffff;
+  --chapter-tint-1: #e4f5eb;
+  --chapter-bg-2: #e8f2ea;
+  --chapter-tint-2: #b7e6cd;
+  --chapter-bg-3: #e2f2f0;
+  --chapter-tint-3: #97ddd8;
+  --chapter-bg-4: #ffffff;
+  --chapter-tint-4: #e4f5eb;
   color-scheme: light;
 }
 
@@ -120,6 +172,19 @@
     transition: background-color var(--duration-theme) ease-out;
   }
 
+  /* El relato escribe `--bg` en cada frame para interpolar el fondo entre
+     capítulos. Con la transición puesta, cada escritura arranca una transición
+     nueva de 300 ms (520 ms la del degradé) y el color queda persiguiendo al
+     scroll con un retraso muy visible: se ve el fondo llegar tarde a cada
+     capítulo. `Chapters` pone esta clase mientras la sección está anclada y la
+     quita al salir. */
+  :root.bg-scrub body,
+  :root.bg-scrub .backdrop::before,
+  :root.bg-scrub .backdrop::after,
+  :root.bg-scrub .backdrop__glow {
+    transition: none;
+  }
+
   /* El shell monta su propio contenedor de scroll: el body nunca scrollea. */
   html,
   body {
@@ -130,11 +195,6 @@
   ::selection {
     background-color: var(--accent);
     color: var(--on-accent);
-  }
-
-  /* El cursor del sistema se reemplaza por el cuadrito lima. */
-  :where(html.has-custom-cursor, html.has-custom-cursor *) {
-    cursor: none;
   }
 
   :focus-visible {
@@ -180,15 +240,40 @@
   }
 }
 
-/* Máscara para el reveal de texto: el hijo se traslada desde abajo del borde. */
+/* Máscara para el reveal de texto: el hijo se traslada desde abajo del borde.
+
+   El colchón vertical existe porque las mayúsculas acentuadas del español (Á, Ó,
+   Ñ) sobresalen del em-box: con `leading-none` y `overflow: hidden` la máscara
+   les corta la tilde. El padding abre el hueco y el margen negativo lo devuelve,
+   así el ritmo del layout no cambia. */
 @utility reveal-mask {
   display: block;
   overflow: hidden;
+  padding-top: 0.14em;
+  margin-top: -0.14em;
 }
 
 /* ==========================================================================
    ANIMACIONES CSS
    ========================================================================== */
+
+/* Indicador de scroll del hero. El bloque global de movimiento reducido de más
+   abajo lo detiene y deja el punto visible y quieto. */
+@keyframes scroll-hint {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateY(0.35rem);
+    opacity: 1;
+  }
+}
+
+.scroll-hint {
+  animation: scroll-hint var(--duration-scroll-hint) var(--ease-cubic-in-out) infinite;
+}
 
 @keyframes signature-draw {
   to {
@@ -212,6 +297,98 @@
   animation:
     signature-show 0s linear var(--path-delay) forwards,
     signature-draw var(--path-dur) var(--ease-signature) var(--path-delay) forwards;
+}
+
+/* ==========================================================================
+   FONDO CON DEGRADÉ
+   Capas de luz por encima del color de `body`, que es quien pinta `--bg` y
+   quien lo transiciona al cambiar de sección. Aquí solo va el volumen.
+   ========================================================================== */
+
+.backdrop {
+  overflow: hidden;
+}
+
+.backdrop::before,
+.backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* `--glow` lo conmuta el scroll por sección: 1 en las profundas, 0 en las
+     negras. Más lento que el fondo (300ms) porque una luz que se apaga de
+     golpe se lee como un corte. */
+  opacity: var(--glow);
+  transition: opacity 520ms ease-out;
+}
+
+/* El foco anclado abajo a la derecha, para que la composición no quede
+   simétrica. Este no se mueve nunca, así que se rasteriza una sola vez. */
+.backdrop::before {
+  background: radial-gradient(
+    46rem 38rem at 88% 92%,
+    color-mix(in oklab, var(--glow-cool) 34%, transparent),
+    transparent 70%
+  );
+}
+
+/* El foco que sigue al puntero.
+   Va en su propia capa y se mueve con `transform` desde el rAF de `Backdrop`:
+   el gradiente se rasteriza una vez y el resto lo hace el compositor. Cambiarle
+   el centro al gradiente en su lugar repinta la pantalla entera cada frame y se
+   nota como retraso en el scroll. `left`/`top` en 0 y el propio elemento
+   centrado con `margin`, para que el transform sea la posición del puntero tal
+   cual. */
+.backdrop__glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 112rem;
+  height: 86rem;
+  margin: -43rem 0 0 -56rem;
+  opacity: var(--glow);
+  transition: opacity 520ms ease-out;
+  will-change: transform;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--glow-warm) 46%, transparent),
+    transparent 100%
+  );
+}
+
+/* Haces inclinados: la insinuación de una luz que entra fuera de cuadro. Las
+   paradas van muy separadas y a opacidad baja — en cuanto se marcan, dejan de
+   leerse como luz y pasan a leerse como rayas. */
+.backdrop::after {
+  background: linear-gradient(
+    104deg,
+    transparent 6%,
+    color-mix(in oklab, var(--glow-warm) 16%, transparent) 17%,
+    transparent 27%,
+    transparent 44%,
+    color-mix(in oklab, var(--glow-cool) 14%, transparent) 56%,
+    transparent 67%,
+    color-mix(in oklab, var(--glow-warm) 10%, transparent) 78%,
+    transparent 88%
+  );
+}
+
+/* ==========================================================================
+   PREVIEW DE PROPUESTA
+   ========================================================================== */
+
+/* Una vuelta cada 42 segundos: apenas se percibe de un vistazo, pero al volver
+   a mirar la tarjeta ya no está igual. Solo se anima el `transform`, así que lo
+   resuelve el compositor sin repintar — importante, porque son diez a la vez.
+   El bloque de movimiento reducido de abajo lo deja quieto. */
+.proposal-preview {
+  transform-origin: 50% 50%;
+  animation: proposal-drift 42s linear infinite;
+}
+
+@keyframes proposal-drift {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==========================================================================

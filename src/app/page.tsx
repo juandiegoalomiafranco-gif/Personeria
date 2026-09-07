@@ -1,18 +1,32 @@
-import { getContent } from "@/content";
+import { Hero } from "@/components/sections/Hero";
+import { Chapters } from "@/components/sections/Chapters";
+import { Manifesto } from "@/components/sections/Manifesto";
+import { Activities } from "@/components/sections/Activities";
+import { WorkGrid } from "@/components/sections/WorkGrid";
+import { Contact } from "@/components/sections/Contact";
 
+/**
+ * Composición de la página.
+ *
+ * El orden es la narración: el hero da los dos nombres, y en cuanto se scrollea
+ * arranca el relato — una sola frase que se escribe palabra a palabra mientras
+ * el fondo cambia de tono. De ahí se cae en el manifiesto, en lo que los formó
+ * y en las propuestas concretas.
+ *
+ * El `data-section-bg` de cada sección es lo que `ScrollChoreography` lee para
+ * conmutar el fondo. El relato es la excepción: declara el tono `chapters`, que
+ * esa coreografía ignora a propósito, porque su fondo lo escribe él mismo
+ * interpolado capítulo a capítulo.
+ */
 export default function Page() {
-  const content = getContent();
-
   return (
-    <main className="flex h-dvh w-full flex-col items-center justify-center gap-4 px-4">
-      <p className="font-mono-2 text-l3 text-xs uppercase">Fase 0 — fundación</p>
-      <h1
-        className="text-l1 text-center text-[7.2svw] leading-none font-bold uppercase lg:text-[6svw]"
-        style={{ fontVariationSettings: '"wdth" 120' }}
-      >
-        {content.brand.name}
-        {content.brand.suffix}
-      </h1>
-    </main>
+    <>
+      <Hero />
+      <Chapters />
+      <Manifesto />
+      <Activities />
+      <WorkGrid />
+      <Contact />
+    </>
   );
 }

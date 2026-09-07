@@ -10,4 +10,4 @@ export function getContent(locale: Locale = DEFAULT_LOCALE): SiteContent {
 }
 
 export { DEFAULT_LOCALE, LOCALES } from "./schema";
-export type { Locale, RichText, RichNode, SiteContent, WorkItem, SocialLink } from "./schema";
+export type { Locale, RichText, RichNode, SiteContent, WorkItem } from "./schema";

@@ -20,6 +20,8 @@ export const DURATION = {
   revealCard: 0.6,
   /** Barrido diagonal al entrar al túnel. */
   wipe: 0.8,
+  /** Ciclo del bob del indicador de scroll del hero. */
+  scrollHint: 2.4,
 } as const;
 
 /** Ritmos de stagger, en segundos entre elementos. */
