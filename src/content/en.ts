@@ -21,7 +21,7 @@ export const en: SiteContent = {
 
   hero: {
     headline: ["Mauro &", "Juan Diego"],
-    meta: ["Student Representative 2026-2027", "Joint ticket", "CCB"],
+    meta: ["Student Representative 2026-2027", "Joint ticket", "Colegio Colombo Británico"],
     scrollHint: "Scroll to see the platform",
   },
 
@@ -180,7 +180,7 @@ export const en: SiteContent = {
   },
 
   contact: {
-    headline: ["Let's", "Build", "something", "extraordinary"],
+    headline: ["Your voice.", "Your ideas.", "Our change."],
     type3d: "Your Voice",
     email: "hola@personeria2026.co",
     copyright: "PERSONERÍA (C) 2026",

@@ -25,7 +25,7 @@ export const es: SiteContent = {
 
   hero: {
     headline: ["Mauro &", "Juan Diego"],
-    meta: ["Personería 2026-2027", "Fórmula estudiantil", "CCB"],
+    meta: ["Personería 2026-2027", "Fórmula estudiantil", "Colegio Colombo Británico"],
     scrollHint: "Desliza para ver la propuesta",
   },
 
@@ -184,7 +184,7 @@ export const es: SiteContent = {
   },
 
   contact: {
-    headline: ["Vamos a", "Crear", "algo", "extraordinario"],
+    headline: ["Tu voz.", "Tus ideas.", "Nuestro cambio."],
     type3d: "Tu Voz",
     email: "hola@personeria2026.co",
     copyright: "PERSONERÍA (C) 2026",
