@@ -32,9 +32,19 @@ export function WorkGrid() {
     <section
       id="propuestas"
       data-section-bg="void"
-      aria-label={work.title}
+      aria-labelledby="propuestas-heading"
       className="relative z-10 w-full px-4 py-18 lg:px-14 lg:py-24"
     >
+      <h2
+        id="propuestas-heading"
+        className="reveal-mask text-l1 mb-8 text-[9svw] leading-none font-bold uppercase lg:mb-14 lg:text-[3.4svw]"
+        style={{ fontVariationSettings: '"wdth" 120' }}
+      >
+        <span data-reveal-line className="block">
+          {work.title}
+        </span>
+      </h2>
+
       <div className="grid w-full grid-cols-12">
         {work.items.map((item, index) => (
           <article

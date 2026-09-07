@@ -9,7 +9,6 @@ import { PointerProvider } from "@/providers/PointerProvider";
 import { ScrollProvider } from "@/providers/ScrollProvider";
 import { StageProvider, useStage } from "@/providers/StageProvider";
 import { ScrollChoreography } from "@/components/animation/ScrollChoreography";
-import { Cursor } from "@/components/ui/Cursor";
 import { Chrome } from "./Chrome";
 import { GridOverlay } from "./GridOverlay";
 import { Preloader } from "./Preloader";
@@ -51,7 +50,6 @@ const ForegroundCanvas = dynamic(
  *   10   contenido de la página
  *   50   chrome (header y barra inferior)
  *   90   preloader
- *   100  cursor
  *   30   canvas de primer plano: stickers y túnel (por encima del chrome,
  *        a propósito — es lo que los hace sentir sueltos en la sala)
  */
@@ -95,7 +93,6 @@ function Stage({ children }: { children: ReactNode }) {
       <ScrollArea ref={containerRef}>{children}</ScrollArea>
       {ready ? <ForegroundCanvas /> : null}
       <Preloader onDone={markReady} />
-      <Cursor />
       <ScrollChoreography />
     </ScrollProvider>
   );

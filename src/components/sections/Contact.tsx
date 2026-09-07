@@ -21,21 +21,6 @@ const HEADLINE_POSITIONS = [
 /** Filas del titular: índices de `headline` que van juntos. */
 const HEADLINE_ROWS = [[0, 1], [2], [3]] as const;
 
-/**
- * Color de acento por segmento, indexado igual que `HEADLINE_POSITIONS`.
- *
- * Reemplaza a la palabra 3D que giraba detrás del titular: en vez de
- * profundidad con geometría, cada segmento revela en un tono distinto,
- * mezclando `--accent` sobre `--label-1` para que ningún tono quede oscuro
- * sobre `--bg-deep` en ninguno de los dos temas.
- */
-const HEADLINE_ACCENTS = [
-  "color-mix(in oklab, var(--accent) 45%, var(--label-1))",
-  "color-mix(in oklab, var(--accent) 75%, var(--label-1))",
-  "var(--accent)",
-  "color-mix(in oklab, var(--accent) 60%, var(--label-1))",
-] as const;
-
 export function Contact() {
   const { contact } = useContent();
 
@@ -53,7 +38,7 @@ export function Contact() {
         >
           {row.map((index) => (
             <span key={index} className={cn("pointer-events-auto", HEADLINE_POSITIONS[index])}>
-              <span data-reveal-line className="block" style={{ color: HEADLINE_ACCENTS[index] }}>
+              <span data-reveal-line className="block">
                 {contact.headline[index]}
               </span>
             </span>

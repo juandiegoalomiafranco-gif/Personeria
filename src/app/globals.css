@@ -197,11 +197,6 @@
     color: var(--on-accent);
   }
 
-  /* El cursor del sistema se reemplaza por el cuadrito lima. */
-  :where(html.has-custom-cursor, html.has-custom-cursor *) {
-    cursor: none;
-  }
-
   :focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;

@@ -1,6 +1,7 @@
 import { Hero } from "@/components/sections/Hero";
 import { Chapters } from "@/components/sections/Chapters";
 import { Manifesto } from "@/components/sections/Manifesto";
+import { Activities } from "@/components/sections/Activities";
 import { WorkGrid } from "@/components/sections/WorkGrid";
 import { Contact } from "@/components/sections/Contact";
 
@@ -9,8 +10,8 @@ import { Contact } from "@/components/sections/Contact";
  *
  * El orden es la narración: el hero da los dos nombres, y en cuanto se scrollea
  * arranca el relato — una sola frase que se escribe palabra a palabra mientras
- * el fondo cambia de tono. De ahí se cae en el manifiesto y en las propuestas
- * concretas.
+ * el fondo cambia de tono. De ahí se cae en el manifiesto, en lo que los formó
+ * y en las propuestas concretas.
  *
  * El `data-section-bg` de cada sección es lo que `ScrollChoreography` lee para
  * conmutar el fondo. El relato es la excepción: declara el tono `chapters`, que
@@ -23,6 +24,7 @@ export default function Page() {
       <Hero />
       <Chapters />
       <Manifesto />
+      <Activities />
       <WorkGrid />
       <Contact />
     </>

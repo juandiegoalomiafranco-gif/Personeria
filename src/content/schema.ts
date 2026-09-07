@@ -39,6 +39,16 @@ export interface WorkItem {
   readonly preview?: { readonly src: string; readonly alt: string };
 }
 
+export interface ActivityItem {
+  /** Identificador estable: se usa como key de React y como nombre de archivo de imagen. */
+  readonly id: string;
+  readonly label: string;
+  /** Qué le aportó esta actividad a la fórmula. */
+  readonly reflection: string;
+  /** Sin imagen todavía, la tarjeta muestra una caja vacía con el label. */
+  readonly image?: { readonly src: string; readonly alt: string };
+}
+
 export interface SiteContent {
   readonly meta: {
     readonly title: string;
@@ -83,6 +93,13 @@ export interface SiteContent {
     readonly primary: RichText;
     /** Párrafo grande en gris, con enlaces. */
     readonly secondary: RichText;
+  };
+
+  readonly activities: {
+    readonly title: string;
+    readonly items: readonly ActivityItem[];
+    /** Cierre de la sección, un párrafo por entrada: por qué esto los formó para el cargo. */
+    readonly closing: readonly RichText[];
   };
 
   readonly work: {

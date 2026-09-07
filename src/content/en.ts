@@ -40,6 +40,44 @@ export const en: SiteContent = {
     ],
   },
 
+  activities: {
+    title: "What shaped us",
+    items: [
+      {
+        id: "rugby",
+        label: "Rugby",
+        reflection:
+          "Rugby taught us to get back up after every hit and look out for the person next to you — nobody moves forward alone there.",
+      },
+      {
+        id: "futbol",
+        label: "Soccer",
+        reflection:
+          "Soccer taught us to read a play together and change the plan mid-match without losing trust in the team.",
+      },
+      {
+        id: "musical",
+        label: "The musical",
+        reflection:
+          "The musical taught us that a good result isn't improvised: you rehearse, you correct, and you hold it together even when your nerves say otherwise.",
+      },
+      {
+        id: "onu",
+        label: "Model UN",
+        reflection:
+          "Model UN taught us to defend a position without ever stopping listening to the other side — and that real negotiation is the only way to actually move something forward.",
+      },
+    ],
+    closing: [
+      [
+        "None of these activities handed us anything: each one made us fall, adjust, and try again — with others, never alone. That's what shaped us for this moment.",
+      ],
+      [
+        "We know how the Personería works: we have voice, not vote, on the school board and the coexistence committee. That's not an excuse — it's exactly why you need someone who'll use every bit of that voice. We're not promising to decide for you; we're promising to represent you and advocate for you in every space where what matters to you gets discussed.",
+      ],
+    ],
+  },
+
   work: {
     title: "Platform",
     items: [

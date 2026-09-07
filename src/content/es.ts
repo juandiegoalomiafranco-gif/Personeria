@@ -44,6 +44,44 @@ export const es: SiteContent = {
     ],
   },
 
+  activities: {
+    title: "Lo que nos formó",
+    items: [
+      {
+        id: "rugby",
+        label: "Rugby",
+        reflection:
+          "El rugby nos enseñó a levantarnos después de cada caída y a cuidar al que tenemos al lado — ahí no se avanza solo.",
+      },
+      {
+        id: "futbol",
+        label: "Fútbol",
+        reflection:
+          "El fútbol nos enseñó a leer una jugada entre varios y a cambiar el plan a mitad de partido sin dejar de confiar en el equipo.",
+      },
+      {
+        id: "musical",
+        label: "El musical",
+        reflection:
+          "El musical nos enseñó que un buen resultado no se improvisa: se ensaya, se corrige y se sostiene aunque los nervios digan lo contrario.",
+      },
+      {
+        id: "onu",
+        label: "Modelo ONU",
+        reflection:
+          "El Modelo ONU nos enseñó a defender una postura sin dejar de escuchar la del otro — y que negociar bien es la única forma real de mover algo.",
+      },
+    ],
+    closing: [
+      [
+        "Ninguna de estas actividades nos regaló nada: cada una nos hizo caer, corregir y volver a intentarlo — con otros, no solos. Eso es lo que nos formó para este momento.",
+      ],
+      [
+        "Sabemos cómo funciona la Personería: tenemos voz, no voto, en el consejo directivo y en el comité de convivencia. No es una excusa — es exactamente por lo que necesitan a alguien que use esa voz a fondo. No prometemos decidir por ustedes; prometemos representarlos y defenderlos en cada espacio donde se hable de lo que les importa.",
+      ],
+    ],
+  },
+
   work: {
     title: "Propuestas",
     items: [
